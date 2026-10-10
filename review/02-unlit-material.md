@@ -52,3 +52,18 @@ not a subjective assessment of global lighting quality.
   skipping reservoirs/rays is desirable before extending this narrow patch.
 - Final upstream wording must be independently human-written under Bevy's policy.
   This owned repository is a review artifact, not a submission to Bevy.
+
+## Observed results, 2026-10-10
+
+Both Apple M5 Pro/Metal and RTX 4060 Ti/Vulkan completed all 15 before and
+15 after captures (60 total). Each corrected case has maximum channel error
+**0** over all 15,363 reference pixels. Raster and forward controls are exact
+before and after. Original Solari medians are (56,56,56) at EV100 9.7 and
+(255,255,255) at EV100 3/0 on this deliberately bright-lit fixture.
+Both shader variants reproduce and pass. These values differ from the existing
+report's low-light fixture; the root failure and exposure dependence agree.
+
+Metal API validation was enabled throughout. Linux has normal wgpu validation
+and actual completed screenshot readback; Khronos Vulkan API layers are absent.
+Strict release Clippy passed on both hosts. The recorded host/toolchain details
+from packet 1 also apply here. No Windows coverage is claimed.

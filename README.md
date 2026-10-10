@@ -77,3 +77,12 @@ or PR description; do not paste these notes upstream.
 
 Sources: https://bevy.org/learn/contribute/policies/ai/ and
 https://github.com/gfx-rs/wgpu/blob/trunk/CONTRIBUTING.md.
+
+## 2. Deferred unlit colors
+
+See [unlit findings and patch commands](review/02-unlit-material.md).
+The matrix compares original/patched Solari with raster and explicit-forward
+controls at three exposures, with both ReSTIR settings.
+
+![Actual Metal captures: control, original, corrected](evidence/unlit-mac/comparison.png)
+![Actual Vulkan captures: control, original, corrected](evidence/unlit-linux/comparison.png)
