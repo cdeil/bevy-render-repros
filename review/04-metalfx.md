@@ -86,7 +86,7 @@ Swift typecheck and the Python assertions pass. PNGs use the same linear-to-sRGB
 mapping for raw, denoised and reference, without a per-image exposure adjustment.
 
 ![Actual native output, frame 15](../evidence/metalfx/comparison-0015.png)
-![Scene-cut reset output, frame 16](../evidence/metalfx/comparison-0016.png)
+![Object-teleport reset output, frame 16](../evidence/metalfx/comparison-0016.png)
 
 ## Existing projects and useful next PR
 
@@ -165,16 +165,11 @@ fallback and never reports native MetalFX execution. The fixture generator also
 ran on Linux; frame 15 SHA256 matches the Mac input exactly:
 `bb81a5ff671cfb7cbd605edc4348c87273d8e0ddd1842caf88119d072b084a34`.
 
-Mac Clippy passed with `-D warnings -A deprecated`: the exemption is for existing
-Rust/glam deprecation warnings, not new migration diagnostics. It does not claim
-an entirely warning-free upstream crate on Rust 1.99. Its default pinned 1.97.1
-can be overridden with `RUSTUP_TOOLCHAIN=stable` for a current installed compiler.
-
-Linux port coverage: **82 existing library tests passed** on Rust 1.98.1, release
-build/check and Clippy completed, and all three procedural consumer modes completed
-screenshot readback. Spatial/temporal report `UnsupportedPlatform`, with images
-identical to the disabled control; no native execution is claimed. macOS and Linux
-CI-style Clippy use the disclosed `-A deprecated` allowance.
+Linux port coverage includes **82 existing library tests** on Rust 1.98.1,
+release build/check and all three procedural consumer modes completing screenshot
+readback. Spatial/temporal report `UnsupportedPlatform`, with images identical to
+the disabled control; no native execution is claimed. The initial Clippy run used
+a deprecation exception; the corrected migration below removes that exception.
 
 ## Correction-round port validation
 
@@ -191,3 +186,18 @@ No deprecation exception is required. This is CPU/tool and bounded GPU evidence;
 full interactive smoke/benchmark rendering, resize, moving camera and presentation
 coverage remain outside this packet. The external frozen consumer still uses
 Bevy0.19 and must itself migrate before its full compatibility trial can pass.
+
+An independent follow-up passed strict all-target Clippy and library/tool tests
+on actual Rust 1.97.1 and 1.99. Documentation now identifies `bevy` 0.20 and
+WESL as the 1.97.1 dependency floor, gives a local patched-candidate installation
+instead of a stale Bevy 0.19 revision, and documents the external consumer-trial
+limit. The timing probe runs eight pass-descriptor cases when encoder timestamps
+are unavailable; registry verification requires the matching `BEVY_VERSION`.
+
+Final Linux validation on Rust 1.98.1 also passes strict all-target Clippy for the
+library and all four tool packages, without warning exceptions: 82 library,
+57 smoke, 69 benchmark, 4 timing-probe and 3 model tests pass. Mac passes the
+changed tools on both 1.97.1 and 1.99 (58 smoke tests on Mac). Platform-specific
+renderer setup and sleep-observer contracts, a misplaced test module, and
+modern array-chunk iteration warnings were corrected without changing the
+portable fallback or declaring native MetalFX execution on Linux.

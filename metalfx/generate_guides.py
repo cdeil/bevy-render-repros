@@ -11,6 +11,7 @@ an image-quality benchmark. Static camera and objects mean motion is zero.
 import argparse
 import json
 from pathlib import Path
+
 import numpy as np
 
 parser = argparse.ArgumentParser()

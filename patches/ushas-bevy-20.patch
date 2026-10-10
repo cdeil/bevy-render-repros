@@ -29,21 +29,21 @@ index 5f9e8fb..9ea2a4b 100644
          with:
            key: metalfx-msrv
 diff --git a/CHANGELOG.md b/CHANGELOG.md
-index 8fd73b0..b0bb726 100644
+index 8fd73b0..f0eb684 100644
 --- a/CHANGELOG.md
 +++ b/CHANGELOG.md
 @@ -46,6 +46,9 @@ Hardware and release acceptance gates are still in progress.
 
  ### Changed (breaking)
 
-+- **Requires Bevy 0.20 / wgpu 30.** MSRV moves 1.95 → 1.97.1, set by `bevy_ecs`
++- **Requires Bevy 0.20 / wgpu 30.** MSRV moves 1.95 → 1.97.1, set by `bevy`
 +  0.20; nothing in this crate's own code needs it. The diagnostic tools under
 +  `tools/` move with it.
  - Replaced app-time P99 adaptation with validated GPU frame-cost input. CPU-only
    slow frames, stale samples, pending scalers, and missing timing do not lower
    quality. Evidence resets on configuration/view changes and explicit workload
 diff --git a/Cargo.toml b/Cargo.toml
-index 6f8f1f3..dadb5bb 100644
+index 6f8f1f3..690e701 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -8,9 +8,9 @@ license = "MIT OR Apache-2.0"
@@ -51,7 +51,7 @@ index 6f8f1f3..dadb5bb 100644
  keywords = ["bevy", "metalfx", "upscaling", "apple", "metal"]
  categories = ["game-engines", "rendering", "graphics"]
 -# Forced by bevy 0.19 / bevy_ecs 0.19, which require 1.95.0. Nothing in this
-+# Forced by bevy 0.20 / bevy_ecs 0.20, which require 1.97.1. Nothing in this
++# Forced by bevy 0.20 and its WESL shader dependencies, which require 1.97.1. Nothing in this
  # crate's own code needs it.
 -rust-version = "1.95"
 +rust-version = "1.97.1"
@@ -79,7 +79,7 @@ index 6f8f1f3..dadb5bb 100644
  # the `metal` crate to objc2, so `raw_handle()` hands back an objc2 object this
  # crate can point at directly. ForeignType::as_ptr() has nothing left to convert.
 diff --git a/README.md b/README.md
-index 5e536ff..5f4ba91 100644
+index 5e536ff..67bde1e 100644
 --- a/README.md
 +++ b/README.md
 @@ -70,8 +70,9 @@ Spatial and temporal upscaling run after the scene pass, before tonemapping and
@@ -94,7 +94,25 @@ index 5e536ff..5f4ba91 100644
 
  Frame interpolation retains a separate, experimental late output path. Its UI
  and HDR composition have not been established for the new early upscaling path.
-@@ -321,7 +322,7 @@ panel-delivery claim.
+@@ -102,12 +103,13 @@ The Development APIs below require the source candidate, rather than the
+ published 0.4 quick start:
+
+ ```toml
+-bevy_metalfx = { git = "https://github.com/mistakeknot/ushas", rev = "f7e27698714ef236b32cfe4cc4a29273e8b3bc5f", features = ["temporal"] }
++bevy_metalfx = { path = "../ushas", features = ["temporal"] }
+ ```
+
+-This revision is an unpublished candidate; hardware validation and release
+-preparation continue separately. A local checkout can use `path = "../ushas"`
+-in place of `git` and `rev`.
++This unpublished Bevy 0.20 candidate currently requires a local checkout with
++the port applied. Hardware validation and release preparation continue
++separately. After the port lands, replace `path` with the upstream `git` URL and
++an exact verified port commit; the former `f7e2769` pin uses Bevy 0.19.
+
+ | Type | Purpose |
+ |------|---------|
+@@ -321,7 +323,7 @@ panel-delivery claim.
 
  | bevy_metalfx | Bevy | MSRV |
  |-------------|------|------|
@@ -103,12 +121,12 @@ index 5e536ff..5f4ba91 100644
  | 0.4.1–0.4.2 | 0.19 | 1.95 |
  | ~~0.4.0~~ (yanked) | 0.19 | 1.95 |
  | 0.1–0.3 | 0.18 | 1.82 |
-@@ -333,6 +334,9 @@ compilation alone does not establish rendered behavior.
+@@ -333,6 +335,9 @@ compilation alone does not establish rendered behavior.
 
  ## Development: Upgrading from 0.4
 
-+The 0.5 candidate requires Bevy 0.20 (wgpu 30) and Rust 1.97.1. `bevy_ecs` 0.20
-+sets that minimum; nothing in this crate's own code needs it.
++The 0.5 candidate requires Bevy 0.20 (wgpu 30) and Rust 1.97.1. `bevy` 0.20
++and its WESL shader dependencies set that minimum; nothing in this crate's own code needs it.
 +
  The upcoming 0.5 changes replace the app-time P99 governor and remove the public
  `AdaptiveScaleState` type. Read `MetalFxAdaptiveStatus` and configure
@@ -124,10 +142,21 @@ index e77743f..305d2cb 100644
  channel = "1.97.1"
  profile = "minimal"
 diff --git a/scripts/verify-published.sh b/scripts/verify-published.sh
-index 51c8578..a1960aa 100755
+index 51c8578..8f96ea2 100755
 --- a/scripts/verify-published.sh
 +++ b/scripts/verify-published.sh
-@@ -117,11 +117,15 @@ if [[ "${1:-}" == "--packaged" ]]; then
+@@ -10,6 +10,10 @@
+ #
+ #   ./verify-published.sh            # against the published 0.4 on crates.io
+ #   ./verify-published.sh --packaged # against the .crate tarball (pre-publish)
++#   BEVY_METALFX_VERSION=0.5 BEVY_VERSION=0.20 ./verify-published.sh
++#                                   # after the Bevy 0.20 release is published
++# Registry mode defaults to Bevy 0.19; BEVY_VERSION must match the chosen crate.
++# --packaged derives the Bevy version from the local manifest.
+ #
+ # --packaged repackages and extracts the tarball itself rather than reusing
+ # target/package/<name>-<ver>/. That directory and the .crate beside it can fall
+@@ -117,11 +121,15 @@ if [[ "${1:-}" == "--packaged" ]]; then
          echo "    ok: ${desc#!}"
      done
      DEP="bevy_metalfx = { path = \"$PKG\" }"
@@ -143,7 +172,7 @@ index 51c8578..a1960aa 100755
      SOURCE="crates.io $VERSION"
      CANDIDATE_FEATURES=""
      DIAGNOSTIC_DEPENDENCY=''
-@@ -139,7 +143,7 @@ edition = "2021"
+@@ -139,7 +147,7 @@ edition = "2021"
  publish = false
 
  [dependencies]
@@ -2764,7 +2793,7 @@ index fd09f9c..435706a 100644
              .map(|p| [p[0], p[1], p[2]])
              .collect();
 diff --git a/tools/benchmark/src/engine.rs b/tools/benchmark/src/engine.rs
-index 02f82d8..0bebc3e 100644
+index 02f82d8..3945d1e 100644
 --- a/tools/benchmark/src/engine.rs
 +++ b/tools/benchmark/src/engine.rs
 @@ -46,6 +46,7 @@ enum Phase {
@@ -2775,7 +2804,17 @@ index 02f82d8..0bebc3e 100644
  struct Request {
      epoch: u64,
      phase: Phase,
-@@ -495,7 +496,7 @@ pub fn run(config: RunConfig) -> EngineResult {
+@@ -408,7 +409,8 @@ pub fn run(config: RunConfig) -> EngineResult {
+             mode: config.mode.metalfx(),
+             render_scale: config.scale,
+             adaptive: false,
+-            ..default()
++            #[cfg(target_os = "macos")]
++            gpu_timing_sink: None,
+         },
+         LabScenePlugin,
+     ));
+@@ -495,7 +497,7 @@ pub fn run(config: RunConfig) -> EngineResult {
          "pipelined_rendering":true,"measurement_per_frame_gpu_callbacks":false,"per_frame_gpu_waits":config.action==Action::Video,"legacy_metalfx_gpu_timing_disabled":true,
          "completion_boundary":if offscreen {"after RenderSystems::PostCleanup; prior wgpu submissions to the owned image target"} else {"after RenderSystems::PostCleanup; prior wgpu submissions, not final native Present buffer"},
          "present_mode_requested":if offscreen {None}else{Some("Immediate")},"present_mode_resolved":null,
@@ -2784,7 +2823,7 @@ index 02f82d8..0bebc3e 100644
          "presentation_note":if offscreen {"No native presentation or live preview; the image target is independent of other window visibility."} else {"Completed-render throughput of this native window path may include drawable acquisition and presentation backpressure; it is not uncapped hardware capacity."},
          "output_physical_pixels":[config.width,config.height],
          "stress_retention":{"maximum_samples":8192,"evicted_completed_samples":evicted_stress_samples,"retained_completed_cohort_details":8},
-@@ -1584,20 +1585,24 @@ fn stream_video_frame(
+@@ -1584,20 +1586,24 @@ fn stream_video_frame(
              }
              std::thread::sleep(Duration::from_millis(1));
          }
@@ -2906,6 +2945,36 @@ index 7e2d53f..5d95ed2 100644
 +bevy = { version = "=0.20.0", default-features = false, features = [
      "bevy_asset", "bevy_color", "bevy_pbr", "bevy_render",
  ] }
+diff --git a/tools/claude-model/src/lib.rs b/tools/claude-model/src/lib.rs
+index cac8dfc..8bd9e90 100644
+--- a/tools/claude-model/src/lib.rs
++++ b/tools/claude-model/src/lib.rs
+@@ -622,8 +622,7 @@ mod tests {
+             .all(|v| (Vec3::from_array(*v).length() - 1.0).abs() < 1e-5));
+         let indices: Vec<_> = mesh.indices().unwrap().iter().collect();
+         let mut edges = BTreeMap::<(usize, usize), usize>::new();
+-        for triangle in indices.chunks_exact(3) {
+-            let [a, b, c] = [triangle[0], triangle[1], triangle[2]];
++        for &[a, b, c] in indices.as_chunks::<3>().0 {
+             let [pa, pb, pc] = [positions[a], positions[b], positions[c]].map(Vec3::from_array);
+             let area = (pb - pa).cross(pc - pa);
+             assert!(
+diff --git a/tools/consumer-smoke/README.md b/tools/consumer-smoke/README.md
+index 445db45..ab8ba99 100644
+--- a/tools/consumer-smoke/README.md
++++ b/tools/consumer-smoke/README.md
+@@ -13,6 +13,11 @@ image correctness and CPU effect decisions. It provides no panel-presentation,
+ GPU-duration, performance, or frame-generation result. An optional, separate
+ completed-render mode adds the bounded throughput comparison described below.
+
++The frozen consumer uses Bevy 0.19 and requires a matching pre-port Ushas
++revision. It must be migrated before a Bevy 0.20 candidate can run this trial,
++including the completed-render instrumentation. Offline fixture tests do not
++establish Bevy 0.20 consumer-trial coverage.
++
+ ## Prepare and compile
+
+ Run from the Ushas repository with Python 3.12+ and Rust 1.97.1. Supply the exact
 diff --git a/tools/smoke/Cargo.lock b/tools/smoke/Cargo.lock
 index ee12f84..1321ce3 100644
 --- a/tools/smoke/Cargo.lock
@@ -5094,6 +5163,147 @@ index ec8d859..d80cc1c 100644
  pub struct CompletionRequest(pub Epoch);
 
  impl Default for CompletionRequest {
+diff --git a/tools/smoke/src/main.rs b/tools/smoke/src/main.rs
+index 58cea63..3e89083 100644
+--- a/tools/smoke/src/main.rs
++++ b/tools/smoke/src/main.rs
+@@ -147,18 +147,24 @@ fn main() -> AppExit {
+         visible: !config.offscreen,
+         ..default()
+     };
++    #[cfg(target_os = "macos")]
+     let experimental_timing = config.experimental_timing;
+     let offscreen = config.offscreen;
+     let completion_enabled = config.completion || config.quality_sequence;
+     let completion_scale = config.scale;
+     let size = (config.width, config.height);
+-    let mut renderer = bevy::render::RenderPlugin::default();
+     #[cfg(target_os = "macos")]
+-    if experimental_timing {
+-        let mut settings = bevy::render::settings::WgpuSettings::default();
+-        settings.features |= bevy_metalfx::frame_timing::requested_features();
+-        renderer.render_creation = settings.into();
+-    }
++    let renderer = {
++        let mut renderer = bevy::render::RenderPlugin::default();
++        if experimental_timing {
++            let mut settings = bevy::render::settings::WgpuSettings::default();
++            settings.features |= bevy_metalfx::frame_timing::requested_features();
++            renderer.render_creation = settings.into();
++        }
++        renderer
++    };
++    #[cfg(not(target_os = "macos"))]
++    let renderer = bevy::render::RenderPlugin::default();
+     let mut app = App::new();
+     let policy = bevy_metalfx::MetalFxAdaptiveConfig {
+         target: config.target_fps.map_or(
+@@ -597,6 +603,50 @@ fn analysis_budget(
+     )
+ }
+
++fn runtime_environment(offscreen: bool) -> Value {
++    let command = |program: &str, args: &[&str]| {
++        std::process::Command::new(program)
++            .args(args)
++            .output()
++            .ok()
++            .filter(|o| o.status.success())
++            .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
++    };
++    let executable = std::env::current_exe().ok();
++    let binary_hash = executable
++        .as_ref()
++        .and_then(|p| p.to_str())
++        .and_then(|p| command("/usr/bin/shasum", &["-a", "256", p]));
++    json!({"executable":executable,"binary_sha256":binary_hash,
++        "rustc":env!("USHAS_RUSTC"),"os":command("/usr/bin/sw_vers", &[]),
++        "metal_debug_layer":std::env::var("MTL_DEBUG_LAYER").ok(),
++        "features":"frame-interpolation (includes temporal)",
++        "surface_mode":if offscreen {"offscreen image / no Winit or swapchain / unpaced ScheduleRunner"} else {"AutoNoVsync / AlwaysOnTop / continuous event loop"},
++        "arguments":std::env::args().skip(1).collect::<Vec<_>>()})
++}
++
++#[cfg(target_os = "macos")]
++fn cpu_timing_stages(
++    stages: bevy_metalfx::frame_timing::ExperimentalTimingStages,
++    harvested_after: Option<Duration>,
++) -> Value {
++    let ms = |duration: Duration| duration.as_secs_f64() * 1000.0;
++    let difference = |end: Option<Duration>, start: Option<Duration>| {
++        end.zip(start)
++            .and_then(|(end, start)| end.checked_sub(start))
++            .map(ms)
++    };
++    json!({
++        "workload_callback_after_encode_ms":stages.workload_callback_after.map(ms),
++        "resolve_submit_after_encode_ms":stages.resolve_submitted_after.map(ms),
++        "mapping_callback_after_encode_ms":stages.mapping_callback_after.map(ms),
++        "harvest_after_encode_ms":harvested_after.map(ms),
++        "workload_callback_to_resolve_submit_ms":difference(stages.resolve_submitted_after,stages.workload_callback_after),
++        "resolve_submit_to_mapping_callback_ms":difference(stages.mapping_callback_after,stages.resolve_submitted_after),
++        "mapping_callback_to_harvest_ms":difference(harvested_after,stages.mapping_callback_after),
++    })
++}
++
+ #[cfg(test)]
+ mod target_budget_tests {
+     use super::*;
+@@ -637,28 +687,6 @@ mod target_budget_tests {
+     }
+ }
+
+-#[cfg(target_os = "macos")]
+-fn cpu_timing_stages(
+-    stages: bevy_metalfx::frame_timing::ExperimentalTimingStages,
+-    harvested_after: Option<Duration>,
+-) -> Value {
+-    let ms = |duration: Duration| duration.as_secs_f64() * 1000.0;
+-    let difference = |end: Option<Duration>, start: Option<Duration>| {
+-        end.zip(start)
+-            .and_then(|(end, start)| end.checked_sub(start))
+-            .map(ms)
+-    };
+-    json!({
+-        "workload_callback_after_encode_ms":stages.workload_callback_after.map(ms),
+-        "resolve_submit_after_encode_ms":stages.resolve_submitted_after.map(ms),
+-        "mapping_callback_after_encode_ms":stages.mapping_callback_after.map(ms),
+-        "harvest_after_encode_ms":harvested_after.map(ms),
+-        "workload_callback_to_resolve_submit_ms":difference(stages.resolve_submitted_after,stages.workload_callback_after),
+-        "resolve_submit_to_mapping_callback_ms":difference(stages.mapping_callback_after,stages.resolve_submitted_after),
+-        "mapping_callback_to_harvest_ms":difference(harvested_after,stages.mapping_callback_after),
+-    })
+-}
+-
+ #[cfg(all(test, target_os = "macos"))]
+ mod timing_telemetry_tests {
+     use super::*;
+@@ -684,25 +712,3 @@ mod timing_telemetry_tests {
+         assert_eq!(complete["mapping_callback_to_harvest_ms"], 4.0);
+     }
+ }
+-
+-fn runtime_environment(offscreen: bool) -> Value {
+-    let command = |program: &str, args: &[&str]| {
+-        std::process::Command::new(program)
+-            .args(args)
+-            .output()
+-            .ok()
+-            .filter(|o| o.status.success())
+-            .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
+-    };
+-    let executable = std::env::current_exe().ok();
+-    let binary_hash = executable
+-        .as_ref()
+-        .and_then(|p| p.to_str())
+-        .and_then(|p| command("/usr/bin/shasum", &["-a", "256", p]));
+-    json!({"executable":executable,"binary_sha256":binary_hash,
+-        "rustc":env!("USHAS_RUSTC"),"os":command("/usr/bin/sw_vers", &[]),
+-        "metal_debug_layer":std::env::var("MTL_DEBUG_LAYER").ok(),
+-        "features":"frame-interpolation (includes temporal)",
+-        "surface_mode":if offscreen {"offscreen image / no Winit or swapchain / unpaced ScheduleRunner"} else {"AutoNoVsync / AlwaysOnTop / continuous event loop"},
+-        "arguments":std::env::args().skip(1).collect::<Vec<_>>()})
+-}
 diff --git a/tools/smoke/src/metrics.rs b/tools/smoke/src/metrics.rs
 index e04227f..a1c99c3 100644
 --- a/tools/smoke/src/metrics.rs
@@ -5120,10 +5330,28 @@ index e04227f..a1c99c3 100644
      let capture_error = if all_zero_rgba {
          Some("all_zero_rgba_readback")
 diff --git a/tools/smoke/src/window_lifecycle.rs b/tools/smoke/src/window_lifecycle.rs
-index a0f3ab7..733773a 100644
+index a0f3ab7..1ee51b9 100644
 --- a/tools/smoke/src/window_lifecycle.rs
 +++ b/tools/smoke/src/window_lifecycle.rs
-@@ -486,7 +486,7 @@ impl Plugin for WindowLifecyclePlugin {
+@@ -27,7 +27,17 @@ pub enum EventKind {
+         window: u64,
+         minimized: Option<bool>,
+     },
++    // Only the macOS NSWorkspace observer produces these; the ledger contract
++    // that consumes them stays portable and tested on every target.
++    #[cfg_attr(
++        not(any(target_os = "macos", test)),
++        expect(dead_code, reason = "only the macOS observer constructs it")
++    )]
+     WillSleep,
++    #[cfg_attr(
++        not(any(target_os = "macos", test)),
++        expect(dead_code, reason = "only the macOS observer constructs it")
++    )]
+     DidWake,
+ }
+
+@@ -486,7 +496,7 @@ impl Plugin for WindowLifecyclePlugin {
      }
  }
 
@@ -5426,10 +5654,24 @@ index bb797e7..68b1f9e 100644
  serde_json = "1"
 
 diff --git a/tools/timing-probe/README.md b/tools/timing-probe/README.md
-index ec1f07c..a87cabb 100644
+index ec1f07c..8b98c23 100644
 --- a/tools/timing-probe/README.md
 +++ b/tools/timing-probe/README.md
-@@ -34,4 +34,8 @@ invalid. Exit zero establishes only that this synthetic probe passed.
+@@ -14,9 +14,10 @@ macOS GPU access may require execution outside a restricted sandbox. A failure
+ to discover any Metal adapter inside a sandbox does not establish lack of
+ hardware support.
+
+-The default run executes 16 synthetic samples: pass-descriptor and encoder
+-timestamp modes, light/heavy dependent compute chains, and zero/20 ms
+-pre-submit CPU-delay controls. Each sample contains three command buffers that
++The default run executes eight pass-descriptor synthetic samples: light/heavy
++dependent compute chains and zero/20 ms pre-submit CPU-delay controls. Where
++`TIMESTAMP_QUERY_INSIDE_ENCODERS` is supported, it also executes eight encoder
++timestamp samples (16 total); unsupported encoder cases are skipped. Each sample contains three command buffers that
+ read/write the same storage buffer, followed by query resolution and readback.
+ The final storage value is checked against an integer CPU reference to reject
+ an empty or incorrect workload. Each readback has a unique encoded sequence ID.
+@@ -34,4 +35,8 @@ invalid. Exit zero establishes only that this synthetic probe passed.
  The committed evidence files retain the initial failures and the successful
  deferred pass-descriptor control. [evidence.json](evidence.json) records exact
  commands, exit outcomes, and the earlier mixed run's incomplete output.

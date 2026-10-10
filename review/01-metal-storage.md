@@ -76,10 +76,14 @@ released Solari and both changes, each Solari case with ReSTIR off and on:
 
 The Solari binaries are built by `build_solari_variants.py` from the released
 `bevy_solari` 0.20.0 crate plus the patch files, without a Bevy checkout. Each
-binary is checked for the expected embedded WGSL text, and the variant lock file
-may differ from this repository's only in the patched crate's source. These runs
-check completion and a non-blank capture; packet 2 checks image content with the
-same struct-based binaries.
+WGSL variant is checked for its embedded marker text. The padding fallback
+changes only Rust, so markers can show only that it lacks the struct change; its
+effect is shown by Metal completing where the released binary aborts. On Vulkan
+the released binary completes too, so there is neither a behavioural proof nor a
+defect to fix there. The variant lock file may differ from this repository's only
+in the patched crate's source. These runs check completion and a non-blank
+capture; packet 2 checks image content with struct-based binaries from the same
+script (its recorded runs did not store the exact pair; see review/02).
 
 The original allocation-patch run against a sibling Bevy checkout at tag
 `v0.20.0` (`b3bdd75`) is recorded in `evidence/solari/` and `evidence/solari-linux/`.
