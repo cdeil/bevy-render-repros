@@ -1,0 +1,4 @@
+Completed 32 frames on Apple M5 Pro; output $RUN_ROOT/reset
+2026-10-10 18:36:10.249 swift-frontend[81250:26824408] Metal API Validation Enabled
+2026-10-10 18:36:10.307 swift-frontend[81250:26824408] [MetalFX] UBFNet fused-MXU path ACTIVE (Metal3; NHWC-native)
+2026-10-10 18:36:10.319 swift-frontend[81250:26824408] [MetalFX] dBFNet fused-MXU path ACTIVE (Metal3; NHWC-native)

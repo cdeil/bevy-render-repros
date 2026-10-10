@@ -1,0 +1,21 @@
+{
+  "disabled": {
+    "returncode": 0,
+    "metal_api_validation": true,
+    "native_upscaler_executed": false
+  },
+  "spatial": {
+    "returncode": 0,
+    "metal_api_validation": true,
+    "native_upscaler_executed": true,
+    "mae_vs_bilinear": 0.2796376546223958,
+    "changed_pixels": 10237
+  },
+  "temporal": {
+    "returncode": 0,
+    "metal_api_validation": true,
+    "native_upscaler_executed": true,
+    "mae_vs_bilinear": 0.27387110392252606,
+    "changed_pixels": 5508
+  }
+}

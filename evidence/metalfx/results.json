@@ -1,0 +1,343 @@
+{
+  "scope": "Seeded analytic diagnostic; not a path-tracer or vendor-quality ranking",
+  "records": [
+    {
+      "frame": 0,
+      "reset_history": true,
+      "raw_mse": 0.04289544001221657,
+      "coherent_mse": 0.00048680114559829235,
+      "reset_mse": 0.00048680114559829235,
+      "coherent_vs_reset_mae": 0.0
+    },
+    {
+      "frame": 1,
+      "reset_history": false,
+      "raw_mse": 0.04400849714875221,
+      "coherent_mse": 0.0004142165998928249,
+      "reset_mse": 0.0004820460162591189,
+      "coherent_vs_reset_mae": 0.006136155687272549
+    },
+    {
+      "frame": 2,
+      "reset_history": false,
+      "raw_mse": 0.04439184442162514,
+      "coherent_mse": 0.000349196488969028,
+      "reset_mse": 0.00048024446005001664,
+      "coherent_vs_reset_mae": 0.007733523845672607
+    },
+    {
+      "frame": 3,
+      "reset_history": false,
+      "raw_mse": 0.043173424899578094,
+      "coherent_mse": 0.00030346334096975625,
+      "reset_mse": 0.0004686217871494591,
+      "coherent_vs_reset_mae": 0.008569318801164627
+    },
+    {
+      "frame": 4,
+      "reset_history": false,
+      "raw_mse": 0.042986609041690826,
+      "coherent_mse": 0.0002691230329219252,
+      "reset_mse": 0.0004929149872623384,
+      "coherent_vs_reset_mae": 0.00945573765784502
+    },
+    {
+      "frame": 5,
+      "reset_history": false,
+      "raw_mse": 0.04291173070669174,
+      "coherent_mse": 0.00024387579469475895,
+      "reset_mse": 0.0004719067073892802,
+      "coherent_vs_reset_mae": 0.009567826986312866
+    },
+    {
+      "frame": 6,
+      "reset_history": false,
+      "raw_mse": 0.043027736246585846,
+      "coherent_mse": 0.0002287033712491393,
+      "reset_mse": 0.00047810550313442945,
+      "coherent_vs_reset_mae": 0.010283906944096088
+    },
+    {
+      "frame": 7,
+      "reset_history": false,
+      "raw_mse": 0.04253963381052017,
+      "coherent_mse": 0.00022266924497671425,
+      "reset_mse": 0.00047318951692432165,
+      "coherent_vs_reset_mae": 0.00954901147633791
+    },
+    {
+      "frame": 8,
+      "reset_history": false,
+      "raw_mse": 0.04337793588638306,
+      "coherent_mse": 0.00021938116697128862,
+      "reset_mse": 0.00045507599133998156,
+      "coherent_vs_reset_mae": 0.010022802278399467
+    },
+    {
+      "frame": 9,
+      "reset_history": false,
+      "raw_mse": 0.04313492029905319,
+      "coherent_mse": 0.0002177052228944376,
+      "reset_mse": 0.000456121691968292,
+      "coherent_vs_reset_mae": 0.01018417626619339
+    },
+    {
+      "frame": 10,
+      "reset_history": false,
+      "raw_mse": 0.04499058052897453,
+      "coherent_mse": 0.0002052733616437763,
+      "reset_mse": 0.0004449677944649011,
+      "coherent_vs_reset_mae": 0.013004904612898827
+    },
+    {
+      "frame": 11,
+      "reset_history": false,
+      "raw_mse": 0.04368877038359642,
+      "coherent_mse": 0.0001959114015335217,
+      "reset_mse": 0.00045676331501454115,
+      "coherent_vs_reset_mae": 0.010898190550506115
+    },
+    {
+      "frame": 12,
+      "reset_history": false,
+      "raw_mse": 0.0425676666200161,
+      "coherent_mse": 0.00019404763588681817,
+      "reset_mse": 0.00047998453374020755,
+      "coherent_vs_reset_mae": 0.010274787433445454
+    },
+    {
+      "frame": 13,
+      "reset_history": false,
+      "raw_mse": 0.04345911741256714,
+      "coherent_mse": 0.0001928656711243093,
+      "reset_mse": 0.0004369780363049358,
+      "coherent_vs_reset_mae": 0.011239346116781235
+    },
+    {
+      "frame": 14,
+      "reset_history": false,
+      "raw_mse": 0.04245739057660103,
+      "coherent_mse": 0.00019617030920926481,
+      "reset_mse": 0.0004961708327755332,
+      "coherent_vs_reset_mae": 0.010652639903128147
+    },
+    {
+      "frame": 15,
+      "reset_history": false,
+      "raw_mse": 0.04334696754813194,
+      "coherent_mse": 0.00020094191131647676,
+      "reset_mse": 0.00048298228648491204,
+      "coherent_vs_reset_mae": 0.009851042181253433
+    },
+    {
+      "frame": 16,
+      "reset_history": true,
+      "raw_mse": 0.04339519515633583,
+      "coherent_mse": 0.00047405328950844705,
+      "reset_mse": 0.00047405328950844705,
+      "coherent_vs_reset_mae": 0.0
+    },
+    {
+      "frame": 17,
+      "reset_history": false,
+      "raw_mse": 0.04342498257756233,
+      "coherent_mse": 0.0004181370895821601,
+      "reset_mse": 0.0004653848009184003,
+      "coherent_vs_reset_mae": 0.006635681260377169
+    },
+    {
+      "frame": 18,
+      "reset_history": false,
+      "raw_mse": 0.04203569516539574,
+      "coherent_mse": 0.0003505363711155951,
+      "reset_mse": 0.0004512905143201351,
+      "coherent_vs_reset_mae": 0.0069587999023497105
+    },
+    {
+      "frame": 19,
+      "reset_history": false,
+      "raw_mse": 0.04308459907770157,
+      "coherent_mse": 0.0002873359771911055,
+      "reset_mse": 0.0004763075849041343,
+      "coherent_vs_reset_mae": 0.009001219645142555
+    },
+    {
+      "frame": 20,
+      "reset_history": false,
+      "raw_mse": 0.042985882610082626,
+      "coherent_mse": 0.0002393551985733211,
+      "reset_mse": 0.0004641252162400633,
+      "coherent_vs_reset_mae": 0.00899581890553236
+    },
+    {
+      "frame": 21,
+      "reset_history": false,
+      "raw_mse": 0.04261944070458412,
+      "coherent_mse": 0.00021311106684152037,
+      "reset_mse": 0.00046373571967706084,
+      "coherent_vs_reset_mae": 0.009222259745001793
+    },
+    {
+      "frame": 22,
+      "reset_history": false,
+      "raw_mse": 0.04287784919142723,
+      "coherent_mse": 0.0001911129365907982,
+      "reset_mse": 0.00046249618753790855,
+      "coherent_vs_reset_mae": 0.010982377454638481
+    },
+    {
+      "frame": 23,
+      "reset_history": false,
+      "raw_mse": 0.04313138499855995,
+      "coherent_mse": 0.0001780552411219105,
+      "reset_mse": 0.0004968220600858331,
+      "coherent_vs_reset_mae": 0.010789180174469948
+    },
+    {
+      "frame": 24,
+      "reset_history": false,
+      "raw_mse": 0.043031640350818634,
+      "coherent_mse": 0.00016941282956395298,
+      "reset_mse": 0.00043796931277029216,
+      "coherent_vs_reset_mae": 0.010933957062661648
+    },
+    {
+      "frame": 25,
+      "reset_history": false,
+      "raw_mse": 0.043189190328121185,
+      "coherent_mse": 0.0001699446584098041,
+      "reset_mse": 0.000462426251033321,
+      "coherent_vs_reset_mae": 0.010119030252099037
+    },
+    {
+      "frame": 26,
+      "reset_history": false,
+      "raw_mse": 0.04247583821415901,
+      "coherent_mse": 0.00017157074762508273,
+      "reset_mse": 0.0004719383141491562,
+      "coherent_vs_reset_mae": 0.009879489429295063
+    },
+    {
+      "frame": 27,
+      "reset_history": false,
+      "raw_mse": 0.04260386526584625,
+      "coherent_mse": 0.0001704549795249477,
+      "reset_mse": 0.00046408738126046956,
+      "coherent_vs_reset_mae": 0.010753869079053402
+    },
+    {
+      "frame": 28,
+      "reset_history": false,
+      "raw_mse": 0.04198448732495308,
+      "coherent_mse": 0.00016716869140509516,
+      "reset_mse": 0.0004708669148385525,
+      "coherent_vs_reset_mae": 0.01147337257862091
+    },
+    {
+      "frame": 29,
+      "reset_history": false,
+      "raw_mse": 0.0427623949944973,
+      "coherent_mse": 0.00016605318523943424,
+      "reset_mse": 0.00046388412010855973,
+      "coherent_vs_reset_mae": 0.011116009205579758
+    },
+    {
+      "frame": 30,
+      "reset_history": false,
+      "raw_mse": 0.042284898459911346,
+      "coherent_mse": 0.00016910803969949484,
+      "reset_mse": 0.0005091812927275896,
+      "coherent_vs_reset_mae": 0.010325133800506592
+    },
+    {
+      "frame": 31,
+      "reset_history": false,
+      "raw_mse": 0.04330074042081833,
+      "coherent_mse": 0.00016736504039727151,
+      "reset_mse": 0.0004384196363389492,
+      "coherent_vs_reset_mae": 0.010446070693433285
+    }
+  ],
+  "native_report": {
+    "api": "MTLFXTemporalDenoisedScaler",
+    "device": "Apple M5 Pro",
+    "encode_wait_seconds": [
+      0.01631796360015869,
+      0.0030829906463623047,
+      0.002406001091003418,
+      0.0024570226669311523,
+      0.003036975860595703,
+      0.003041982650756836,
+      0.0030770301818847656,
+      0.003035902976989746,
+      0.0030471086502075195,
+      0.002974987030029297,
+      0.002673029899597168,
+      0.0030679702758789062,
+      0.002962946891784668,
+      0.0029449462890625,
+      0.00264894962310791,
+      0.0028699636459350586,
+      0.002959012985229492,
+      0.0029920339584350586,
+      0.0027480125427246094,
+      0.0029441118240356445,
+      0.0029010772705078125,
+      0.0029000043869018555,
+      0.0029098987579345703,
+      0.0029619932174682617,
+      0.0030219554901123047,
+      0.002752065658569336,
+      0.0027320384979248047,
+      0.00283205509185791,
+      0.0030280351638793945,
+      0.002837061882019043,
+      0.002812981605529785,
+      0.0030139684677124023
+    ],
+    "frames": 32,
+    "gpu_seconds": [
+      0.011592249968089163,
+      0.0018656249158084393,
+      0.0017180416034534574,
+      0.0015777084045112133,
+      0.0019851666875183582,
+      0.001975666615180671,
+      0.001963124959729612,
+      0.002005874994210899,
+      0.0020135833183303475,
+      0.001968374941498041,
+      0.0017493333434686065,
+      0.002012499957345426,
+      0.0019780000438913703,
+      0.0019665833096951246,
+      0.0017021249514073133,
+      0.0018983749905601144,
+      0.0019287499599158764,
+      0.0019687500316649675,
+      0.001839541713707149,
+      0.0019337499979883432,
+      0.0019435000140219927,
+      0.001961624948307872,
+      0.001944374991580844,
+      0.0019170833984389901,
+      0.0019592083990573883,
+      0.0017926249420270324,
+      0.0018310000887140632,
+      0.0018413750221952796,
+      0.0019930832786485553,
+      0.001872749999165535,
+      0.001848874962888658,
+      0.0019819583976641297
+    ],
+    "height": 192,
+    "history": "Reset at first frame and explicit scene cut; optional reset-every-frame control",
+    "initialization_s": 0.9345070123672485,
+    "metal_api_validation": true,
+    "motion_mapping": "Unjittered UV displacement, negated and scaled to pixels",
+    "os": "Version 27.0.1 (Build 26A434)",
+    "roughness_mapping": "Fixture perceptual roughness squared to linear roughness",
+    "scope": "Offline replay of original procedural buffers, native resolution, actual completed Metal commands. GPU timings include output readback. Not a live Bevy integration or a cross-host renderer benchmark.",
+    "width": 320
+  }
+}

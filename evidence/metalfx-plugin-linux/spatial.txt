@@ -1,0 +1,7 @@
+Current-frame effect evidence: [MetalFxEffectSnapshot { frame_id: 102, view_id: 4294967044, freshness: Current, last_observation: Some(MetalFxEffectObservation { frame_id: 102, view_id: 4294967044, requested_mode: Spatial, effective_mode: Disabled, requested_scale: 0.5, content_size: [512, 512], output_size: [512, 512], state: Unavailable, reason: Some(UnsupportedPlatform), observed_at: Instant { tv_sec: 281186, tv_nsec: 640396884 }, sequence: 101 }) }]
+Completed screenshot readback; mode=Spatial; update=104; ready=true
+[2m2026-10-10T15:17:49.579660Z[0m [32m INFO[0m [2mbevy_render::renderer[0m[2m:[0m AdapterInfo { name: "NVIDIA GeForce RTX 4060 Ti", vendor: 4318, device: 10243, device_type: DiscreteGpu, device_pci_bus_id: "0000:01:00.0", driver: "NVIDIA", driver_info: "610.57.04", backend: Vulkan, subgroup_min_size: 32, subgroup_max_size: 32, transient_saves_memory: Some(false), limit_bucket: None }
+[2m2026-10-10T15:17:49.726062Z[0m [33m WARN[0m [2mbevy_metalfx[0m[2m:[0m MetalFX is not available on this system — plugin disabled
+[2m2026-10-10T15:17:49.726210Z[0m [32m INFO[0m [2mbevy_pbr::cluster[0m[2m:[0m GPU clustering is supported on this device.
+[2m2026-10-10T15:17:49.726220Z[0m [32m INFO[0m [2mbevy_render::batching::gpu_preprocessing[0m[2m:[0m GPU preprocessing is fully supported on this device.
+[2m2026-10-10T15:17:50.530666Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to $REPRO_REPO/evidence/metalfx-plugin-linux/spatial.png
