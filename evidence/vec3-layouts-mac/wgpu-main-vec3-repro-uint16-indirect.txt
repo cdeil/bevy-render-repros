@@ -1,0 +1,4 @@
+adapter=AdapterInfo { name: "Apple M5 Pro", vendor: 0, device: 0, device_type: IntegratedGpu, device_pci_bus_id: "", driver: "", driver_info: "", backend: Metal, subgroup_min_size: 4, subgroup_max_size: 64, transient_saves_memory: Some(true), limit_bucket: None }; size=16; scalar_struct=false; array=false; indirect=true; kind=u32; validation=Ok("1")
+GPU readback verified: [00000001, 00000002, 00000003, deadbeef]
+Indirect dispatch verified: 6 workgroups
+2026-10-10 18:26:02.944 wgpu-main-vec3-repro[64575:26720031] Metal API Validation Enabled
