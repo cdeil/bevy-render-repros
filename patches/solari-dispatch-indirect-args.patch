@@ -1,0 +1,36 @@
+Adapted from bevyengine/bevy@b3bdd75becaffe9a16677cf5bae5bd6d198f052b (MIT);
+source paths are listed in the diff, original change is described in review/.
+License and notices: THIRD_PARTY_NOTICES.md and LICENSES/bevy-MIT.txt.
+TECHNICAL DRAFT prepared with AI assistance. Its code comments and documentation
+text are not submission prose: under Bevy's AI policy a human contributor must
+understand the change and independently write any prose before submission.
+Preferred packet 1 change: 12-byte DispatchIndirectArgs struct, allocation unchanged.
+Also applies unchanged to inspected main 0e93c7ab7d5ec016990dcb226ec544aee1636d70.
+
+diff --git a/crates/bevy_solari/src/realtime/world_cache_compact.wesl b/crates/bevy_solari/src/realtime/world_cache_compact.wesl
+index bdd4f80..5f2159b 100644
+--- a/crates/bevy_solari/src/realtime/world_cache_compact.wesl
++++ b/crates/bevy_solari/src/realtime/world_cache_compact.wesl
+@@ -5,7 +5,13 @@ import package::realtime::bindings::{
+
+ enable wgpu_ray_query;
+
+-@group(2) @binding(0) var<storage, read_write> world_cache_active_cells_dispatch: vec3<u32>;
++struct DispatchIndirectArgs {
++    x: u32,
++    y: u32,
++    z: u32,
++}
++
++@group(2) @binding(0) var<storage, read_write> world_cache_active_cells_dispatch: DispatchIndirectArgs;
+
+ var<workgroup> w1: array<u32, 1024u>;
+ var<workgroup> w2: array<u32, 1024u>;
+@@ -74,6 +80,6 @@ fn compact_world_cache_write_active_cells(
+     if thread_index == 1023u && workgroup_id.x == 1023u {
+         let active_cell_count = compacted_index + u32(cell_active);
+         world_cache.active_cells_count = active_cell_count;
+-        world_cache_active_cells_dispatch = vec3((active_cell_count + 63u) / 64u, 1u, 1u);
++        world_cache_active_cells_dispatch = DispatchIndirectArgs((active_cell_count + 63u) / 64u, 1u, 1u);
+     }
+ }
