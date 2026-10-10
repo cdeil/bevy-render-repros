@@ -296,6 +296,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy-capture-repro"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy-scene-repro"
 version = "0.1.0"
 dependencies = [

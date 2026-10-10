@@ -1,0 +1,21 @@
+diff --git a/crates/bevy_asset/src/io/embedded/mod.rs b/crates/bevy_asset/src/io/embedded/mod.rs
+index ec3b60f..a6aa2ec 100644
+--- a/crates/bevy_asset/src/io/embedded/mod.rs
++++ b/crates/bevy_asset/src/io/embedded/mod.rs
+@@ -306,2 +306,6 @@ pub fn _embedded_asset_path(
+ ///
++/// Register the embedded asset before adding plugins or running systems that load it.
++/// Asset requests may start during plugin construction. Registering a source after an
++/// earlier request failed does not guarantee that the request will be retried.
++///
+ /// `rock.wgsl` can now be loaded by the [`AssetServer`] as follows:
+diff --git a/crates/bevy_render/src/lib.rs b/crates/bevy_render/src/lib.rs
+index 04608ac..9defac6 100644
+--- a/crates/bevy_render/src/lib.rs
++++ b/crates/bevy_render/src/lib.rs
+@@ -163,2 +163,5 @@ pub struct RenderPlugin {
+     /// This has no effect on macOS, Wasm, iOS, or without the `multi_threaded` feature.
++    ///
++    /// This only controls pipeline compilation. Assets must still finish loading and
++    /// render resources must be prepared before an offline capture can be complete.
+     pub synchronous_pipeline_compilation: bool,
