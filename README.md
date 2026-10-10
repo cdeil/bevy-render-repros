@@ -92,3 +92,11 @@ controls at three exposures, with both ReSTIR settings.
 [Capture findings](review/03-capture-readiness.md) include a small original custom
 material, tested registration-order controls and a proposed documentation patch.
 These are integration lessons, not a new renderer bug report.
+
+## 4. Native MetalFX denoising and bridge proposal
+
+[Native API proof and missing integration contract](review/04-metalfx.md) include
+original analytic geometry, real Metal GPU output, a scene-cut reset check and a
+reset-every-frame control. This is not a live Bevy plugin or vendor-quality ranking.
+
+![Actual native diagnostic output](evidence/metalfx/comparison-0015.png)
