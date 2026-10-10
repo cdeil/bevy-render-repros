@@ -1,0 +1,21 @@
+Adapted from bevyengine/bevy@0e93c7ab7d5ec016990dcb226ec544aee1636d70 (MIT);
+source paths are listed in the diff, original change is described in review/.
+License and notices: THIRD_PARTY_NOTICES.md and LICENSES/bevy-MIT.txt.
+
+--- a/crates/bevy_solari/src/scene/types.rs
++++ b/crates/bevy_solari/src/scene/types.rs
+@@ -12,8 +12,13 @@
+ ///
+ /// The mesh used in this component must declare the BLAS its material needs in
+ /// [`Mesh::raytracing`],
+-/// use the following set of vertex attributes: `{POSITION, NORMAL, UV_0, TANGENT}`, use [`bevy_mesh::PrimitiveTopology::TriangleList`],
++/// use exactly the following set of vertex attributes: `{POSITION, NORMAL, UV_0, TANGENT}`, use [`bevy_mesh::PrimitiveTopology::TriangleList`],
+ /// and use [`bevy_mesh::Indices::U32`].
++///
++/// Skinned and morphed meshes are not supported. Additional vertex attributes,
++/// including joint indices and weights, make a mesh incompatible. A separate
++/// compatible mesh can represent a static pose, but it does not automatically
++/// follow skinning or morph deformation on this entity.
+ ///
+ /// The material used for this entity must be [`MeshMaterial3d<StandardMaterial>`].
+ #[derive(

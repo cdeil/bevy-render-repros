@@ -1,3 +1,7 @@
+Adapted from bevyengine/bevy@b3bdd75becaffe9a16677cf5bae5bd6d198f052b (MIT);
+source paths are listed in the diff, original change is described in review/.
+License and notices: THIRD_PARTY_NOTICES.md and LICENSES/bevy-MIT.txt.
+
 diff --git a/crates/bevy_solari/src/realtime/gbuffer_utils.wesl b/crates/bevy_solari/src/realtime/gbuffer_utils.wesl
 index b6dceba..3f03203 100644
 --- a/crates/bevy_solari/src/realtime/gbuffer_utils.wesl

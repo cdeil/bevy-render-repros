@@ -11,7 +11,9 @@ contain small upstream source excerpts as diff context:
 - Other `patches/solari-*.patch` and `patches/capture-readiness-docs.patch`:
   adapted diff context from [bevyengine/bevy@v0.20.0](https://github.com/bevyengine/bevy/tree/b3bdd75becaffe9a16677cf5bae5bd6d198f052b),
   relevant files named in each diff. Original changes add dispatch padding,
-  unlit composition or asset/capture documentation. Upstream's MIT text has no
+  unlit composition or asset/capture/skinning documentation.
+  The `solari-skinning-docs-main.patch` variant instead uses inspected main
+  `0e93c7ab7d5ec016990dcb226ec544aee1636d70`; its source paths are named in the diff. Upstream's MIT text has no
   copyright line. MIT license text: [LICENSES/bevy-MIT.txt](LICENSES/bevy-MIT.txt).
 
 Both upstream projects offer MIT or Apache-2.0 licensing; these excerpts use MIT.

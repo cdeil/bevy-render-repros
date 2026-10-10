@@ -1,3 +1,7 @@
+Adapted from bevyengine/bevy@b3bdd75becaffe9a16677cf5bae5bd6d198f052b (MIT);
+source paths are listed in the diff, original change is described in review/.
+License and notices: THIRD_PARTY_NOTICES.md and LICENSES/bevy-MIT.txt.
+
 diff --git a/crates/bevy_asset/src/io/embedded/mod.rs b/crates/bevy_asset/src/io/embedded/mod.rs
 index ec3b60f..a6aa2ec 100644
 --- a/crates/bevy_asset/src/io/embedded/mod.rs

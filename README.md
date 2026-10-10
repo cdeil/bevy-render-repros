@@ -105,3 +105,9 @@ The same packet includes a prepared [Bevy 0.20 port of the existing upscaler
 plugin](review/04-metalfx.md#additional-concrete-migration-patch), its original
 procedural consumer and actual spatial/temporal output checks. Upscaling and
 ray denoising remain separate features.
+
+## 5. Skinned meshes and ray geometry
+
+[Known limitation and prepared documentation change](review/05-solari-skinning.md)
+compare native skinning, a stale bind-pose copy and an original CPU-baked control
+on Metal and Vulkan. No duplicate tracking issue is proposed.
