@@ -86,3 +86,9 @@ controls at three exposures, with both ReSTIR settings.
 
 ![Actual Metal captures: control, original, corrected](evidence/unlit-mac/comparison.png)
 ![Actual Vulkan captures: control, original, corrected](evidence/unlit-linux/comparison.png)
+
+## 3. Embedded shader ordering and capture readiness
+
+[Capture findings](review/03-capture-readiness.md) include a small original custom
+material, tested registration-order controls and a proposed documentation patch.
+These are integration lessons, not a new renderer bug report.

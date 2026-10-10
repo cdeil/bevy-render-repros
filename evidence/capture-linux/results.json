@@ -1,0 +1,62 @@
+[
+  {
+    "case": "early-sync",
+    "red_pixels": {
+      "0": 15376,
+      "5": 15376,
+      "100": 15376
+    },
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "early-async",
+    "red_pixels": {
+      "0": 0,
+      "5": 0,
+      "100": 15376
+    },
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "adjacent-sync",
+    "red_pixels": {
+      "0": 15376,
+      "5": 15376,
+      "100": 15376
+    },
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "adjacent-async",
+    "red_pixels": {
+      "0": 0,
+      "5": 0,
+      "100": 15376
+    },
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "late-sync",
+    "red_pixels": {
+      "0": 0,
+      "5": 0,
+      "100": 0
+    },
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "late-async",
+    "red_pixels": {
+      "0": 0,
+      "5": 0,
+      "100": 0
+    },
+    "returncode": 0,
+    "metal_api_validation": false
+  }
+]
