@@ -6,6 +6,7 @@ reviewed run is added to `evidence/` under a new name by an explicit copy.
 """
 
 import datetime
+import hashlib
 import os
 import sys
 from pathlib import Path
@@ -14,6 +15,12 @@ ROOT = Path(__file__).resolve().parent
 MAC = sys.platform == "darwin"
 HOST = "mac" if MAC else "linux"
 VALIDATION_LINE = "Metal API Validation Enabled"
+# Embedded shader text proves which WGSL changes a Solari binary contains. The
+# padding fallback changes only Rust, so no marker can show its presence.
+SOLARI_MARKERS = {
+    "solari-dispatch-indirect-args.patch": "DispatchIndirectArgs((active_cell_count",
+    "solari-unlit-color.patch": "if surface.unlit {",
+}
 
 
 def fresh_root(requested: str | None, name: str) -> Path:
@@ -24,7 +31,8 @@ def fresh_root(requested: str | None, name: str) -> Path:
         )
         stamp = datetime.datetime.now(datetime.UTC).strftime("%Y%m%dT%H%M%SZ")
         requested = data / "runs" / f"{name}-{HOST}-{stamp}"
-    path = Path(requested).absolute()
+    # Resolve symlinks so a linked path cannot reach into the checkout.
+    path = Path(requested).resolve()
     if path == ROOT or ROOT in path.parents:
         sys.exit(
             f"Refusing to write inside the checkout: {path}. Copy reviewed runs instead."
@@ -59,3 +67,15 @@ def require_validation(log: str) -> bool | None:
         f"Missing '{VALIDATION_LINE}' in a Metal run:\n{log[-2000:]}"
     )
     return enabled
+
+
+def binary_fingerprint(binary: str | Path) -> dict:
+    """File name, SHA-256 and embedded WGSL marker presence of a built binary."""
+    contents = Path(binary).read_bytes()
+    return {
+        "name": Path(binary).name,
+        "sha256": hashlib.sha256(contents).hexdigest(),
+        "markers": {
+            marker: marker.encode() in contents for marker in SOLARI_MARKERS.values()
+        },
+    }
