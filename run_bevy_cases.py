@@ -11,8 +11,10 @@ import resource
 import signal
 import subprocess
 from pathlib import Path
+
 import numpy as np
 from PIL import Image
+
 from repro_run import MAC, fresh_root, require_validation, sanitize
 
 parser = argparse.ArgumentParser()

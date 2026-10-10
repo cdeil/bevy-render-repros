@@ -74,14 +74,18 @@ adds `--unlit`, `--ev`, `--restir`, `--forward`, `--deferred` (deferred raster
 control), `--texture`, `--color r,g,b` and `--lit-cube`.
 
 The proposed downstream change is `patches/solari-dispatch-indirect-args.patch`:
-it binds the dispatch buffer as Bevy's existing `DispatchIndirectArgs` struct, so
+it binds the dispatch buffer as a module-local `DispatchIndirectArgs` struct with
+the same `x, y, z: u32` layout as the copies Bevy's meshlet shaders declare, so
 the 12-byte allocation no longer depends on how Naga translates `vec3`.
 `patches/solari-metal-dispatch-padding.patch` is kept as a clearly marked
 **fallback** that only enlarges the allocation to 16 bytes.
 
 `build_solari_variants.py` builds this scene against patched copies of the
 released `bevy_solari` 0.20.0 crate from Cargo's registry; no Bevy checkout is
-needed or modified. It checks the embedded shader text of every binary and keeps
+needed or modified. It checks embedded WGSL marker text: the struct and unlit
+changes must be present exactly where applied. The padding fallback changes only
+Rust, so markers can only show that it carries neither WGSL change; its effect is
+shown by its Metal behaviour. The script records each binary's SHA-256 and keeps
 copies of the binaries in its run folder.
 
 ```bash
@@ -152,9 +156,18 @@ base shape. No duplicate tracking issue is proposed.
 
 ![Actual Metal captures with controls](evidence/skinning-controls-mac/comparison.png)
 
-Before any upstream push, inspect the proposed commits with
-`git log --format=fuller --format='%h %an <%ae>%n%B' <upstream-base>..HEAD` and
-`git log --format=%B <upstream-base>..HEAD | rg -i 'Co-authored-by:.*(Claude|Codex|OpenAI|Anthropic)'`.
-No agent co-author trailers may reach Bevy or wgpu. Independently human-write
-all upstream prose, including rustdoc and explanatory code comments in these
-technical drafts; human ownership and submission approval are still required.
+Before any upstream push, inspect the proposed commits, their author and
+committer, and every changed line:
+
+```sh
+git log --format=fuller <upstream-base>..HEAD
+git log -p --format=%B <upstream-base>..HEAD \
+  | rg -i 'co-authored-by|generated with|assisted-by|claude|codex|copilot|anthropic|openai|gemini|🤖|technical draft|ai assistance'
+```
+
+Review every match in context: legitimate crate names or code can also match.
+Remove agent co-author trailers, tool footers and technical-draft patch headers
+from the proposed upstream commits. Preserve any independently human-written
+assistance disclosure required by the target project. Independently human-write
+all eventual Bevy prose, including rustdoc and explanatory comments; human code
+ownership and submission approval are still required.
