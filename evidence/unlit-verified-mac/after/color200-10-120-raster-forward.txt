@@ -1,0 +1,3 @@
+Procedural cube and floor; no downloaded assets; output=$RUN_ROOT/after/color200-10-120-raster-forward.png
+160 updates completed; screenshot saved; solari=false
+2026-10-10 19:21:51.460 bevy-scene-solari-struct-unlit[9609:27002934] Metal API Validation Enabled
