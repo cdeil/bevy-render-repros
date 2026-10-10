@@ -3,18 +3,24 @@
     "case": "raster",
     "returncode": 0,
     "shell_exit": 0,
-    "screenshot": true
+    "screenshot": true,
+    "metal_api_validation": true,
+    "expected_layout_failure": false
   },
   {
     "case": "solari",
     "returncode": -6,
     "shell_exit": 134,
-    "screenshot": false
+    "screenshot": false,
+    "metal_api_validation": true,
+    "expected_layout_failure": true
   },
   {
     "case": "solari-padded",
     "returncode": 0,
     "shell_exit": 0,
-    "screenshot": true
+    "screenshot": true,
+    "metal_api_validation": true,
+    "expected_layout_failure": false
   }
 ]

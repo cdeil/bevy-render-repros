@@ -1,0 +1,35 @@
+Procedural cube and floor; no downloaded assets; output=$REPRO_REPO/evidence/solari-linux/raster.png
+[2m2026-10-10T14:33:03.698986Z[0m [32m INFO[0m [2mbevy_render::renderer[0m[2m:[0m AdapterInfo { name: "NVIDIA GeForce RTX 4060 Ti", vendor: 4318, device: 10243, device_type: DiscreteGpu, device_pci_bus_id: "0000:01:00.0", driver: "NVIDIA", driver_info: "610.57.04", backend: Vulkan, subgroup_min_size: 32, subgroup_max_size: 32, transient_saves_memory: Some(false), limit_bucket: None }
+[2m2026-10-10T14:33:03.896941Z[0m [32m INFO[0m [2mbevy_pbr::cluster[0m[2m:[0m GPU clustering is supported on this device.
+[2m2026-10-10T14:33:03.896957Z[0m [32m INFO[0m [2mbevy_render::batching::gpu_preprocessing[0m[2m:[0m GPU preprocessing is fully supported on this device.
+[2m2026-10-10T14:33:03.917881Z[0m [31mERROR[0m [2mbevy_render::error_handler[0m[2m:[0m Caught rendering error: Validation Error
+
+Caused by:
+  In Device::create_texture, label = 'main_texture_a'
+    Texture usages TextureUsages(STORAGE_BINDING) are not allowed on a texture of type Rgba8UnormSrgb
+
+[2m2026-10-10T14:33:03.917893Z[0m [31mERROR[0m [2mbevy_render::error_handler[0m[2m:[0m Caught rendering error: Validation Error
+
+Caused by:
+  In Texture::create_view
+    Texture with 'main_texture_a' label is invalid
+
+[2m2026-10-10T14:33:03.917896Z[0m [31mERROR[0m [2mbevy_render::error_handler[0m[2m:[0m Caught rendering error: Validation Error
+
+Caused by:
+  In Device::create_texture, label = 'main_texture_b'
+    Texture usages TextureUsages(STORAGE_BINDING) are not allowed on a texture of type Rgba8UnormSrgb
+
+[2m2026-10-10T14:33:03.917898Z[0m [31mERROR[0m [2mbevy_render::error_handler[0m[2m:[0m Caught rendering error: Validation Error
+
+Caused by:
+  In Texture::create_view
+    Texture with 'main_texture_b' label is invalid
+
+[2m2026-10-10T14:33:04.060911Z[0m [31mERROR[0m [2mbevy_render::error_handler[0m[2m:[0m Caught rendering error: Validation Error
+
+Caused by:
+  In Device::create_bind_group
+    TextureView with '' label is invalid
+
+[2m2026-10-10T14:33:04.060946Z[0m [31mERROR[0m [2mbevy_render::error_handler[0m[2m:[0m Caught rendering error: Validation Error

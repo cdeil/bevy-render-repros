@@ -46,7 +46,29 @@ screenshot. Solari aborted in `compact_world_cache_write_active_cells` with
 Metal validation enabled. Applying the allocation patch to Bevy tag `v0.20.0`
 completed 160 Solari updates and saved a screenshot with validation enabled.
 The exact source base is `b3bdd75` (full hash in the environment record).
-Linux/Vulkan controls are being checked separately.
+The release/current-upstream wgpu matrix also completed all 16 cases on
+Linux/Vulkan, including correct 12-byte vector readbacks. This isolates the
+failure to the observed Metal translation/argument layout. Hardware: RTX 4060 Ti,
+driver 610.57.04, Rust 1.98.1. The Khronos Vulkan validation layer is not installed
+on that machine; these are actual GPU readback checks with normal wgpu
+validation, not a claim of Vulkan API-layer coverage.
+
+The first Linux scene control exposed a mistake in this reproducer: it requested
+storage usage even for the raster camera's sRGB main texture. Vulkan rejects
+that usage. Storage usage is now added only to the HDR Solari camera. That
+reproducer correction is separate from the proposed engine allocation patch.
+After that correction, raster, unpatched Solari and patched Solari all completed
+160 updates and captured images on Vulkan. On Metal, raster and patched Solari
+completed; unpatched Solari still gave the specific 12/16-byte assertion.
+
+The patched Bevy Solari crate's four existing unit tests passed on Mac. The
+initial direct crate-test build lacked a required zstd backend; the completed
+command explicitly enabled it:
+
+```bash
+cargo test --release --manifest-path ../bevy/Cargo.toml \
+  -p bevy_solari --lib --features bevy_image/zstd_rust
+```
 
 ## Human review before any submission
 

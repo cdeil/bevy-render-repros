@@ -9,5 +9,13 @@
   "rustc": "rustc 1.99.0 (b940084d7 2026-09-28) (Homebrew)",
   "wgpu_release": "30.0.1",
   "wgpu_main": "14dd4e8f717cd8c4381908895495ea19ef924c35",
-  "bevy_release": "b3bdd75becaffe9a16677cf5bae5bd6d198f052b"
+  "bevy_release": "b3bdd75becaffe9a16677cf5bae5bd6d198f052b",
+  "linux": {
+    "kernel": "7.2.5-3-omarchy",
+    "gpu": "NVIDIA GeForce RTX 4060 Ti",
+    "driver": "610.57.04",
+    "rustc": "1.98.1",
+    "backend": "Vulkan",
+    "khronos_validation_layer": "not installed; normal wgpu validation and GPU readback checks only"
+  }
 }
