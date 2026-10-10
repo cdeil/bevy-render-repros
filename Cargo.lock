@@ -310,6 +310,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy-skinning-repro"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_a11y"
 version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
