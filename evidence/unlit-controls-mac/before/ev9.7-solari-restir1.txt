@@ -1,0 +1,3 @@
+Procedural cube and floor; no downloaded assets; output=$RUN_ROOT/before/ev9.7-solari-restir1.png
+160 updates completed; screenshot saved; solari=true
+2026-10-10 18:29:57.121 bevy-scene-solari-dispatch-struct[68976:26748829] Metal API Validation Enabled

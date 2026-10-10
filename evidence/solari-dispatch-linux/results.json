@@ -1,0 +1,65 @@
+[
+  {
+    "case": "raster",
+    "binary": "bevy-scene-repro",
+    "returncode": 0,
+    "shell_exit": 0,
+    "screenshot": true,
+    "metal_api_validation": null,
+    "expected_layout_failure": false
+  },
+  {
+    "case": "solari",
+    "binary": "bevy-scene-repro",
+    "returncode": 0,
+    "shell_exit": 0,
+    "screenshot": true,
+    "metal_api_validation": null,
+    "expected_layout_failure": false
+  },
+  {
+    "case": "solari-struct",
+    "binary": "bevy-scene-solari-dispatch-struct",
+    "returncode": 0,
+    "shell_exit": 0,
+    "screenshot": true,
+    "metal_api_validation": null,
+    "expected_layout_failure": false
+  },
+  {
+    "case": "solari-padded",
+    "binary": "bevy-scene-solari-dispatch-padding",
+    "returncode": 0,
+    "shell_exit": 0,
+    "screenshot": true,
+    "metal_api_validation": null,
+    "expected_layout_failure": false
+  },
+  {
+    "case": "solari-restir",
+    "binary": "bevy-scene-repro",
+    "returncode": 0,
+    "shell_exit": 0,
+    "screenshot": true,
+    "metal_api_validation": null,
+    "expected_layout_failure": false
+  },
+  {
+    "case": "solari-struct-restir",
+    "binary": "bevy-scene-solari-dispatch-struct",
+    "returncode": 0,
+    "shell_exit": 0,
+    "screenshot": true,
+    "metal_api_validation": null,
+    "expected_layout_failure": false
+  },
+  {
+    "case": "solari-padded-restir",
+    "binary": "bevy-scene-solari-dispatch-padding",
+    "returncode": 0,
+    "shell_exit": 0,
+    "screenshot": true,
+    "metal_api_validation": null,
+    "expected_layout_failure": false
+  }
+]
