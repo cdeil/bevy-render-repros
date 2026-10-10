@@ -1,3 +1,12 @@
+Adapted from bevyengine/bevy@b3bdd75becaffe9a16677cf5bae5bd6d198f052b (MIT);
+source paths are listed in the diff, original change is described in review/.
+License and notices: THIRD_PARTY_NOTICES.md and LICENSES/bevy-MIT.txt.
+TECHNICAL DRAFT prepared with AI assistance. Its code comments and documentation
+text are not submission prose: under Bevy's AI policy a human contributor must
+understand the change and independently write any prose before submission.
+FALLBACK ONLY for packet 1. Prefer solari-dispatch-indirect-args.patch; use this
+allocation-only variant only if maintainers do not want a WGSL change.
+
 diff --git a/crates/bevy_solari/src/realtime/prepare.rs b/crates/bevy_solari/src/realtime/prepare.rs
 index 95f52f6..22f3e37 100644
 --- a/crates/bevy_solari/src/realtime/prepare.rs

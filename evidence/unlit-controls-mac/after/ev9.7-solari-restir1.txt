@@ -1,0 +1,7 @@
+Procedural cube and floor; no downloaded assets; output=$RUN_ROOT/after/ev9.7-solari-restir1.png
+160 updates completed; screenshot saved; solari=true
+2026-10-10 18:31:11.945 bevy-scene-solari-struct-unlit[71953:26766482] Metal API Validation Enabled
+2026-10-10T16:31:11.998584Z  WARN bevy_shader::shader_cache: Shader `embedded://bevy_solari/realtime/presample_light_tiles.wesl` has an unresolved import:
+error: module not found: `bevy_solari::realtime::bindings` (no shader registered for this module path)
+  |
+  = note: in unknown module

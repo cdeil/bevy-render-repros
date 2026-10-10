@@ -1,0 +1,33 @@
+{
+  "dispatch-struct": {
+    "binary": "dispatch-struct/bin/bevy-scene-solari-dispatch-struct",
+    "patches": [
+      "solari-dispatch-indirect-args.patch"
+    ],
+    "markers": {
+      "DispatchIndirectArgs((active_cell_count": true,
+      "if surface.unlit {": false
+    }
+  },
+  "dispatch-padding": {
+    "binary": "dispatch-padding/bin/bevy-scene-solari-dispatch-padding",
+    "patches": [
+      "solari-metal-dispatch-padding.patch"
+    ],
+    "markers": {
+      "DispatchIndirectArgs((active_cell_count": false,
+      "if surface.unlit {": false
+    }
+  },
+  "struct-unlit": {
+    "binary": "struct-unlit/bin/bevy-scene-solari-struct-unlit",
+    "patches": [
+      "solari-dispatch-indirect-args.patch",
+      "solari-unlit-color.patch"
+    ],
+    "markers": {
+      "DispatchIndirectArgs((active_cell_count": true,
+      "if surface.unlit {": true
+    }
+  }
+}
