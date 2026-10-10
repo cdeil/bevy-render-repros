@@ -133,3 +133,9 @@ Mac Clippy passed with `-D warnings -A deprecated`: the exemption is for existin
 Rust/glam deprecation warnings, not new migration diagnostics. It does not claim
 an entirely warning-free upstream crate on Rust 1.99. Its default pinned 1.97.1
 can be overridden with `RUSTUP_TOOLCHAIN=stable` for a current installed compiler.
+
+Linux port coverage: **82 existing library tests passed** on Rust 1.98.1, release
+build/check and Clippy completed, and all three procedural consumer modes completed
+screenshot readback. Spatial/temporal report `UnsupportedPlatform`, with images
+identical to the disabled control; no native execution is claimed. macOS and Linux
+CI-style Clippy use the disclosed `-A deprecated` allowance.
