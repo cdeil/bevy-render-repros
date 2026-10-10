@@ -1,10 +1,17 @@
 use bevy::{
-    camera::{CameraMainTextureUsages, RenderTarget},
+    asset::RenderAssetUsages,
+    camera::{CameraMainTextureUsages, Exposure, RenderTarget},
+    core_pipeline::{
+        prepass::{DeferredPrepass, DepthPrepass},
+        tonemapping::{DebandDither, Tonemapping},
+    },
+    image::ImageSampler,
+    material::OpaqueRendererMethod,
     mesh::Indices,
     prelude::*,
     render::{
         pipelined_rendering::PipelinedRenderingPlugin,
-        render_resource::{TextureFormat, TextureUsages},
+        render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
         view::window::screenshot::{Screenshot, save_to_disk},
     },
     solari::prelude::{RaytracingMesh3d, SolariLighting, SolariPlugins},
@@ -15,6 +22,14 @@ use bevy::{
 struct Settings {
     solari: bool,
     output: String,
+    unlit: bool,
+    forward: bool,
+    restir: bool,
+    ev: f32,
+    deferred: bool,
+    color: [u8; 3],
+    texture: bool,
+    lit_cube: bool,
 }
 
 #[derive(Resource)]
@@ -46,6 +61,25 @@ fn main() {
     .insert_resource(Settings {
         solari,
         output: output.clone(),
+        unlit: args.iter().any(|s| s == "--unlit"),
+        forward: args.iter().any(|s| s == "--forward"),
+        restir: args.iter().any(|s| s == "--restir"),
+        ev: args
+            .iter()
+            .position(|s| s == "--ev")
+            .and_then(|i| args.get(i + 1))
+            .map_or(9.7, |s| s.parse().unwrap()),
+        deferred: args.iter().any(|s| s == "--deferred"),
+        color: args
+            .iter()
+            .position(|s| s == "--color")
+            .and_then(|i| args.get(i + 1))
+            .map_or([128, 32, 32], |s| {
+                let values: Vec<u8> = s.split(',').map(|v| v.parse().unwrap()).collect();
+                values.try_into().expect("--color r,g,b")
+            }),
+        texture: args.iter().any(|s| s == "--texture"),
+        lit_cube: args.iter().any(|s| s == "--lit-cube"),
     })
     .add_systems(Startup, setup);
     if solari {
@@ -87,13 +121,49 @@ fn setup(
         Transform::from_xyz(3.0, 2.5, 5.0).looking_at(Vec3::new(0.0, 0.5, 0.0), Vec3::Y),
         Msaa::Off,
     ));
+    // Raster control that packs the same G-buffer Solari reads.
+    if settings.deferred && !settings.solari {
+        camera.insert((DeferredPrepass, DepthPrepass));
+    }
     if settings.solari {
         camera.insert((
-            SolariLighting::default(),
+            SolariLighting {
+                restir: settings.restir,
+                ..default()
+            },
             CameraMainTextureUsages::default().with(TextureUsages::STORAGE_BINDING),
         ));
     }
-    for (shape, position, colour) in [
+    if settings.unlit {
+        camera.insert((
+            Tonemapping::None,
+            DebandDither::Disabled,
+            Exposure { ev100: settings.ev },
+        ));
+    }
+    let [r, g, b] = settings.color;
+    // Nearest-sampled 2x2 checker of the authored color and blue.
+    let checker = settings.texture.then(|| {
+        let mut image = Image::new(
+            Extent3d {
+                width: 2,
+                height: 2,
+                depth_or_array_layers: 1,
+            },
+            TextureDimension::D2,
+            vec![
+                r, g, b, 255, 32, 32, 128, 255, //
+                32, 32, 128, 255, r, g, b, 255,
+            ],
+            TextureFormat::Rgba8UnormSrgb,
+            RenderAssetUsages::default(),
+        );
+        image.sampler = ImageSampler::nearest();
+        images.add(image)
+    });
+    // `--lit-cube` keeps the cube color but makes it an ordinary lit material.
+    let unlit_cube = settings.unlit && !settings.lit_cube;
+    for (index, (shape, position, colour)) in [
         (
             Cuboid::new(1.0, 1.0, 1.0),
             Vec3::new(0.0, 0.6, 0.0),
@@ -104,7 +174,10 @@ fn setup(
             Vec3::ZERO,
             Color::srgb(0.5, 0.5, 0.5),
         ),
-    ] {
+    ]
+    .into_iter()
+    .enumerate()
+    {
         let mut mesh = Mesh::from(shape);
         mesh.generate_tangents().unwrap();
         if let Some(Indices::U16(indices)) = mesh.indices() {
@@ -116,7 +189,24 @@ fn setup(
         let mut entity = commands.spawn((
             Mesh3d(mesh.clone()),
             MeshMaterial3d(materials.add(StandardMaterial {
-                base_color: colour,
+                base_color: if settings.unlit && index == 0 {
+                    if settings.texture {
+                        Color::WHITE
+                    } else {
+                        Color::srgb_u8(r, g, b)
+                    }
+                } else {
+                    colour
+                },
+                base_color_texture: if index == 0 { checker.clone() } else { None },
+                unlit: unlit_cube && index == 0,
+                opaque_render_method: if settings.forward {
+                    OpaqueRendererMethod::Forward
+                } else if settings.deferred {
+                    OpaqueRendererMethod::Deferred
+                } else {
+                    OpaqueRendererMethod::Auto
+                },
                 ..default()
             })),
             Transform::from_translation(position),

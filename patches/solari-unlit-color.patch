@@ -1,0 +1,47 @@
+Adapted from bevyengine/bevy@b3bdd75becaffe9a16677cf5bae5bd6d198f052b (MIT);
+source paths are listed in the diff, original change is described in review/.
+License and notices: THIRD_PARTY_NOTICES.md and LICENSES/bevy-MIT.txt.
+TECHNICAL DRAFT prepared with AI assistance. Its code comments and documentation
+text are not submission prose: under Bevy's AI policy a human contributor must
+understand the change and independently write any prose before submission.
+
+diff --git a/crates/bevy_solari/src/realtime/gbuffer_utils.wesl b/crates/bevy_solari/src/realtime/gbuffer_utils.wesl
+index b6dceba..3f03203 100644
+--- a/crates/bevy_solari/src/realtime/gbuffer_utils.wesl
++++ b/crates/bevy_solari/src/realtime/gbuffer_utils.wesl
+@@ -1,2 +1,2 @@
+-import bevy_pbr::deferred::types::unpack_24bit_normal;
++import bevy_pbr::deferred::types::{unpack_24bit_normal, unpack_flags, DEFERRED_FLAGS_UNLIT_BIT};
+ import bevy_pbr::render::rgb9e5::rgb9e5_to_vec3_;
+@@ -10,2 +10,3 @@ struct ResolvedGPixel {
+     material: ResolvedMaterial,
++    unlit: bool,
+ }
+@@ -26,3 +27,4 @@ fn gpixel_resolve(gpixel: vec4<u32>, depth: f32, pixel_id: vec2<u32>, view_size:
+
+-    return ResolvedGPixel(world_position, world_normal, material);
++    let unlit = (unpack_flags(gpixel.a) & DEFERRED_FLAGS_UNLIT_BIT) != 0u;
++    return ResolvedGPixel(world_position, world_normal, material, unlit);
+ }
+diff --git a/crates/bevy_solari/src/realtime/no_restir.wesl b/crates/bevy_solari/src/realtime/no_restir.wesl
+index f15fcd0..71e3e88 100644
+--- a/crates/bevy_solari/src/realtime/no_restir.wesl
++++ b/crates/bevy_solari/src/realtime/no_restir.wesl
+@@ -25,2 +25,6 @@ fn initial_and_shade(@builtin(workgroup_id) workgroup_id: vec3<u32>, @builtin(gl
+     pixel_color *= view.exposure;
++    // Deferred unlit base color is stored in the emissive G-buffer channel.
++    if surface.unlit {
++        pixel_color = surface.material.emissive;
++    }
+     textureStore(view_output, global_id.xy, vec4(pixel_color, 1.0));
+diff --git a/crates/bevy_solari/src/realtime/restir.wesl b/crates/bevy_solari/src/realtime/restir.wesl
+index 8211b29..a719cb0 100644
+--- a/crates/bevy_solari/src/realtime/restir.wesl
++++ b/crates/bevy_solari/src/realtime/restir.wesl
+@@ -68,2 +68,6 @@ fn spatial_and_shade(@builtin(global_invocation_id) global_id: vec3<u32>) {
+     pixel_color *= view.exposure;
++    // Deferred unlit base color is stored in the emissive G-buffer channel.
++    if surface.unlit {
++        pixel_color = surface.material.emissive;
++    }
+     textureStore(view_output, global_id.xy, vec4(pixel_color, 1.0));

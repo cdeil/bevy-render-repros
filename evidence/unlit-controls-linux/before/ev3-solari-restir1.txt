@@ -1,0 +1,6 @@
+Procedural cube and floor; no downloaded assets; output=$RUN_ROOT/before/ev3-solari-restir1.png
+160 updates completed; screenshot saved; solari=true
+[2m2026-10-10T16:37:58.481938Z[0m [32m INFO[0m [2mbevy_render::renderer[0m[2m:[0m AdapterInfo { name: "NVIDIA GeForce RTX 4060 Ti", vendor: 4318, device: 10243, device_type: DiscreteGpu, device_pci_bus_id: "0000:01:00.0", driver: "NVIDIA", driver_info: "610.57.04", backend: Vulkan, subgroup_min_size: 32, subgroup_max_size: 32, transient_saves_memory: Some(false), limit_bucket: None }
+[2m2026-10-10T16:37:58.627370Z[0m [32m INFO[0m [2mbevy_pbr::cluster[0m[2m:[0m GPU clustering is supported on this device.
+[2m2026-10-10T16:37:58.627387Z[0m [32m INFO[0m [2mbevy_render::batching::gpu_preprocessing[0m[2m:[0m GPU preprocessing is fully supported on this device.
+[2m2026-10-10T16:37:59.576387Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to $RUN_ROOT/before/ev3-solari-restir1.png

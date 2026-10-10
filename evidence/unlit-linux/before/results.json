@@ -1,0 +1,242 @@
+[
+  {
+    "case": "raster-restir0-ev9.7",
+    "ev100": 9.7,
+    "restir": false,
+    "mode": "raster",
+    "pixels": 15363,
+    "median_rgb": [
+      128.0,
+      32.0,
+      32.0
+    ],
+    "max_channel_error": 0,
+    "mean_channel_error": 0.0,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "raster-restir0-ev3",
+    "ev100": 3.0,
+    "restir": false,
+    "mode": "raster",
+    "pixels": 15363,
+    "median_rgb": [
+      128.0,
+      32.0,
+      32.0
+    ],
+    "max_channel_error": 0,
+    "mean_channel_error": 0.0,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "raster-restir0-ev0",
+    "ev100": 0.0,
+    "restir": false,
+    "mode": "raster",
+    "pixels": 15363,
+    "median_rgb": [
+      128.0,
+      32.0,
+      32.0
+    ],
+    "max_channel_error": 0,
+    "mean_channel_error": 0.0,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "solari-restir0-ev9.7",
+    "ev100": 9.7,
+    "restir": false,
+    "mode": "solari",
+    "pixels": 15363,
+    "median_rgb": [
+      56.0,
+      56.0,
+      56.0
+    ],
+    "max_channel_error": 216,
+    "mean_channel_error": 40.37913601944065,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "solari-restir0-ev3",
+    "ev100": 3.0,
+    "restir": false,
+    "mode": "solari",
+    "pixels": 15363,
+    "median_rgb": [
+      255.0,
+      255.0,
+      255.0
+    ],
+    "max_channel_error": 223,
+    "mean_channel_error": 189.88010154266746,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "solari-restir0-ev0",
+    "ev100": 0.0,
+    "restir": false,
+    "mode": "solari",
+    "pixels": 15363,
+    "median_rgb": [
+      255.0,
+      255.0,
+      255.0
+    ],
+    "max_channel_error": 223,
+    "mean_channel_error": 191.0,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "solari-restir1-ev9.7",
+    "ev100": 9.7,
+    "restir": true,
+    "mode": "solari",
+    "pixels": 15363,
+    "median_rgb": [
+      56.0,
+      56.0,
+      56.0
+    ],
+    "max_channel_error": 178,
+    "mean_channel_error": 40.36249430449782,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "solari-restir1-ev3",
+    "ev100": 3.0,
+    "restir": true,
+    "mode": "solari",
+    "pixels": 15363,
+    "median_rgb": [
+      255.0,
+      255.0,
+      255.0
+    ],
+    "max_channel_error": 223,
+    "mean_channel_error": 190.11427889518106,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "solari-restir1-ev0",
+    "ev100": 0.0,
+    "restir": true,
+    "mode": "solari",
+    "pixels": 15363,
+    "median_rgb": [
+      255.0,
+      255.0,
+      255.0
+    ],
+    "max_channel_error": 223,
+    "mean_channel_error": 191.0,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "forward-restir0-ev9.7",
+    "ev100": 9.7,
+    "restir": false,
+    "mode": "forward",
+    "pixels": 15363,
+    "median_rgb": [
+      128.0,
+      32.0,
+      32.0
+    ],
+    "max_channel_error": 0,
+    "mean_channel_error": 0.0,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "forward-restir0-ev3",
+    "ev100": 3.0,
+    "restir": false,
+    "mode": "forward",
+    "pixels": 15363,
+    "median_rgb": [
+      128.0,
+      32.0,
+      32.0
+    ],
+    "max_channel_error": 0,
+    "mean_channel_error": 0.0,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "forward-restir0-ev0",
+    "ev100": 0.0,
+    "restir": false,
+    "mode": "forward",
+    "pixels": 15363,
+    "median_rgb": [
+      128.0,
+      32.0,
+      32.0
+    ],
+    "max_channel_error": 0,
+    "mean_channel_error": 0.0,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "forward-restir1-ev9.7",
+    "ev100": 9.7,
+    "restir": true,
+    "mode": "forward",
+    "pixels": 15363,
+    "median_rgb": [
+      128.0,
+      32.0,
+      32.0
+    ],
+    "max_channel_error": 0,
+    "mean_channel_error": 0.0,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "forward-restir1-ev3",
+    "ev100": 3.0,
+    "restir": true,
+    "mode": "forward",
+    "pixels": 15363,
+    "median_rgb": [
+      128.0,
+      32.0,
+      32.0
+    ],
+    "max_channel_error": 0,
+    "mean_channel_error": 0.0,
+    "returncode": 0,
+    "metal_api_validation": false
+  },
+  {
+    "case": "forward-restir1-ev0",
+    "ev100": 0.0,
+    "restir": true,
+    "mode": "forward",
+    "pixels": 15363,
+    "median_rgb": [
+      128.0,
+      32.0,
+      32.0
+    ],
+    "max_channel_error": 0,
+    "mean_channel_error": 0.0,
+    "returncode": 0,
+    "metal_api_validation": false
+  }
+]

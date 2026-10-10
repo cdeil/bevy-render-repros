@@ -5,6 +5,7 @@ Original procedural Rust/Swift examples, small GPU captures and proposed patches
 | Candidate | Prepared contribution | Runner |
 | --- | --- | --- |
 | [Metal dispatch](review/01-metal-storage.md) | Struct fix; existing wgpu #5739 | `run_vec3_matrix.py`, `run_bevy_cases.py` |
+| [Unlit color](review/02-unlit-material.md) | Primary-visibility composition fix; Bevy #26083 | `run_unlit_matrix.py` |
 
 ## Build and run
 
