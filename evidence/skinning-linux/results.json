@@ -1,0 +1,81 @@
+{
+  "records": [
+    {
+      "case": "native-0-raster",
+      "foreground_pixels": 9120,
+      "returncode": 0,
+      "metal_api_validation": false
+    },
+    {
+      "case": "native-0.8-raster",
+      "foreground_pixels": 7805,
+      "returncode": 0,
+      "metal_api_validation": false
+    },
+    {
+      "case": "bind-copy-0-raster",
+      "foreground_pixels": 9120,
+      "returncode": 0,
+      "metal_api_validation": false
+    },
+    {
+      "case": "bind-copy-0.8-raster",
+      "foreground_pixels": 7805,
+      "returncode": 0,
+      "metal_api_validation": false
+    },
+    {
+      "case": "baked-0-raster",
+      "foreground_pixels": 9120,
+      "returncode": 0,
+      "metal_api_validation": false
+    },
+    {
+      "case": "baked-0.8-raster",
+      "foreground_pixels": 7805,
+      "returncode": 0,
+      "metal_api_validation": false
+    },
+    {
+      "case": "native-0-ray",
+      "foreground_pixels": 0,
+      "returncode": 0,
+      "metal_api_validation": false
+    },
+    {
+      "case": "native-0.8-ray",
+      "foreground_pixels": 0,
+      "returncode": 0,
+      "metal_api_validation": false
+    },
+    {
+      "case": "bind-copy-0-ray",
+      "foreground_pixels": 9120,
+      "returncode": 0,
+      "metal_api_validation": false
+    },
+    {
+      "case": "bind-copy-0.8-ray",
+      "foreground_pixels": 9120,
+      "returncode": 0,
+      "metal_api_validation": false
+    },
+    {
+      "case": "baked-0-ray",
+      "foreground_pixels": 9120,
+      "returncode": 0,
+      "metal_api_validation": false
+    },
+    {
+      "case": "baked-0.8-ray",
+      "foreground_pixels": 7859,
+      "returncode": 0,
+      "metal_api_validation": false
+    }
+  ],
+  "checks": {
+    "baked_ray_vs_skinned_raster_iou_0": 1.0,
+    "baked_ray_vs_skinned_raster_iou_0.8": 0.9845432661852274,
+    "bind_pose_ray_vs_moved_raster_iou": 0.19695898161244696
+  }
+}
