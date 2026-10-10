@@ -1,0 +1,3 @@
+Completed 160 updates; late=true; asynchronous=false
+2026-10-10 16:56:15.718 bevy-capture-repro[29147:26504936] Metal API Validation Enabled
+2026-10-10T14:56:15.740020Z ERROR bevy_asset::server: Path not found: bevy_capture_repro/marker.wesl

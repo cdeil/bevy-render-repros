@@ -1,0 +1,7 @@
+Completed 160 updates; late=false; asynchronous=false
+[2m2026-10-10T14:57:47.081889Z[0m [32m INFO[0m [2mbevy_render::renderer[0m[2m:[0m AdapterInfo { name: "NVIDIA GeForce RTX 4060 Ti", vendor: 4318, device: 10243, device_type: DiscreteGpu, device_pci_bus_id: "0000:01:00.0", driver: "NVIDIA", driver_info: "610.57.04", backend: Vulkan, subgroup_min_size: 32, subgroup_max_size: 32, transient_saves_memory: Some(false), limit_bucket: None }
+[2m2026-10-10T14:57:47.227939Z[0m [32m INFO[0m [2mbevy_pbr::cluster[0m[2m:[0m GPU clustering is supported on this device.
+[2m2026-10-10T14:57:47.227955Z[0m [32m INFO[0m [2mbevy_render::batching::gpu_preprocessing[0m[2m:[0m GPU preprocessing is fully supported on this device.
+[2m2026-10-10T14:57:47.378493Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to $REPRO_REPO/evidence/capture-linux/adjacent-sync-0.png
+[2m2026-10-10T14:57:47.410276Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to $REPRO_REPO/evidence/capture-linux/adjacent-sync-5.png
+[2m2026-10-10T14:57:47.999711Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to $REPRO_REPO/evidence/capture-linux/adjacent-sync-100.png

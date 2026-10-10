@@ -1,0 +1,2 @@
+Completed 160 updates; late=false; asynchronous=false
+2026-10-10 16:56:09.031 bevy-capture-repro[29100:26504670] Metal API Validation Enabled
