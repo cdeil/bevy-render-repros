@@ -85,11 +85,13 @@ fn setup(
         Camera3d::default(),
         RenderTarget::Image(target.into()),
         Transform::from_xyz(3.0, 2.5, 5.0).looking_at(Vec3::new(0.0, 0.5, 0.0), Vec3::Y),
-        CameraMainTextureUsages::default().with(TextureUsages::STORAGE_BINDING),
         Msaa::Off,
     ));
     if settings.solari {
-        camera.insert(SolariLighting::default());
+        camera.insert((
+            SolariLighting::default(),
+            CameraMainTextureUsages::default().with(TextureUsages::STORAGE_BINDING),
+        ));
     }
     for (shape, position, colour) in [
         (
