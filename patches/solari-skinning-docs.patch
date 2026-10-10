@@ -1,0 +1,32 @@
+Adapted from bevyengine/bevy@b3bdd75becaffe9a16677cf5bae5bd6d198f052b (MIT);
+source paths are listed in the diff, original change is described in review/.
+License and notices: THIRD_PARTY_NOTICES.md and LICENSES/bevy-MIT.txt.
+TECHNICAL DRAFT prepared with AI assistance. Its code comments and documentation
+text are not submission prose: under Bevy's AI policy a human contributor must
+understand the change and independently write any prose before submission.
+
+diff --git a/crates/bevy_solari/src/scene/types.rs b/crates/bevy_solari/src/scene/types.rs
+index ef81cf5..172860e 100644
+--- a/crates/bevy_solari/src/scene/types.rs
++++ b/crates/bevy_solari/src/scene/types.rs
+@@ -11,9 +11,19 @@ use derive_more::derive::From;
+ /// A mesh component used for raytracing.
+ ///
+ /// The mesh used in this component must have [`Mesh::enable_raytracing`] set to true,
+-/// use the following set of vertex attributes: `{POSITION, NORMAL, UV_0, TANGENT}`, use [`bevy_mesh::PrimitiveTopology::TriangleList`],
++/// use exactly the following set of vertex attributes, in their default formats: `{POSITION, NORMAL, UV_0, TANGENT}`, use [`bevy_mesh::PrimitiveTopology::TriangleList`],
+ /// and use [`bevy_mesh::Indices::U32`].
+ ///
++/// Meshes that do not meet these requirements are skipped without a warning.
++/// Skinned meshes are skipped because joint indices and weights are additional
++/// vertex attributes. Morph targets are not vertex attributes and are ignored:
++/// a compatible morphed mesh is ray traced in its unmorphed base shape.
++///
++/// A separate compatible mesh can represent a static pose, but it does not follow
++/// later skinning or morph changes. It is placed by this entity's transform, which
++/// skinning does not apply, so a pose baked from joint matrices must be expressed
++/// in this entity's local space.
++///
+ /// The material used for this entity must be [`MeshMaterial3d<StandardMaterial>`].
+ #[derive(
+     Component, FromTemplate, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, From,

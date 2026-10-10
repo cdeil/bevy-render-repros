@@ -8,6 +8,7 @@ Original procedural Rust/Swift examples, small GPU captures and proposed patches
 | [Unlit color](review/02-unlit-material.md) | Primary-visibility composition fix; Bevy #26083 | `run_unlit_matrix.py` |
 | [Capture readiness](review/03-capture-readiness.md) | Asset-order/readiness documentation | `run_capture_matrix.py` |
 | [MetalFX](review/04-metalfx.md) | Native denoising proof; separate Bevy 0.20 upscaler port | `metalfx/run_native.py`, `run_plugin_matrix.py` |
+| [Skinning](review/05-solari-skinning.md) | Known mesh/deformation limits; documentation | `run_skinning_matrix.py` |
 
 ## Build and run
 

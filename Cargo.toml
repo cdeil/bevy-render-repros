@@ -1,5 +1,5 @@
 [workspace]
-members = ["wgpu-vec3", "bevy-scene", "capture-scene"]
+members = ["wgpu-vec3", "bevy-scene", "capture-scene", "skinning-scene"]
 resolver = "3"
 
 [profile.dev]

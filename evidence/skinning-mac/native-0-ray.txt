@@ -1,0 +1,3 @@
+Procedural two-joint prism; mode=native; angle=0; no downloaded assets
+Completed 200 updates and screenshot readback; ray=true
+2026-10-10 17:29:33.226 bevy-skinning-repro[37057:26556846] Metal API Validation Enabled
