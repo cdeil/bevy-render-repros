@@ -1,0 +1,3 @@
+Procedural cube and floor; no downloaded assets; output=$REPRO_REPO/evidence/unlit-mac/before/raster-restir0-ev0.png
+160 updates completed; screenshot saved; solari=false
+2026-10-10 16:48:36.657 bevy-scene-patched-repro[27076:26493290] Metal API Validation Enabled

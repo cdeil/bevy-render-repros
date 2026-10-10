@@ -1,5 +1,7 @@
 use bevy::{
-    camera::{CameraMainTextureUsages, RenderTarget},
+    camera::{CameraMainTextureUsages, Exposure, RenderTarget},
+    core_pipeline::tonemapping::{DebandDither, Tonemapping},
+    material::OpaqueRendererMethod,
     mesh::Indices,
     prelude::*,
     render::{
@@ -15,6 +17,10 @@ use bevy::{
 struct Settings {
     solari: bool,
     output: String,
+    unlit: bool,
+    forward: bool,
+    restir: bool,
+    ev: f32,
 }
 
 #[derive(Resource)]
@@ -46,6 +52,14 @@ fn main() {
     .insert_resource(Settings {
         solari,
         output: output.clone(),
+        unlit: args.iter().any(|s| s == "--unlit"),
+        forward: args.iter().any(|s| s == "--forward"),
+        restir: args.iter().any(|s| s == "--restir"),
+        ev: args
+            .iter()
+            .position(|s| s == "--ev")
+            .and_then(|i| args.get(i + 1))
+            .map_or(9.7, |s| s.parse().unwrap()),
     })
     .add_systems(Startup, setup);
     if solari {
@@ -89,11 +103,21 @@ fn setup(
     ));
     if settings.solari {
         camera.insert((
-            SolariLighting::default(),
+            SolariLighting {
+                restir: settings.restir,
+                ..default()
+            },
             CameraMainTextureUsages::default().with(TextureUsages::STORAGE_BINDING),
         ));
     }
-    for (shape, position, colour) in [
+    if settings.unlit {
+        camera.insert((
+            Tonemapping::None,
+            DebandDither::Disabled,
+            Exposure { ev100: settings.ev },
+        ));
+    }
+    for (index, (shape, position, colour)) in [
         (
             Cuboid::new(1.0, 1.0, 1.0),
             Vec3::new(0.0, 0.6, 0.0),
@@ -104,7 +128,10 @@ fn setup(
             Vec3::ZERO,
             Color::srgb(0.5, 0.5, 0.5),
         ),
-    ] {
+    ]
+    .into_iter()
+    .enumerate()
+    {
         let mut mesh = Mesh::from(shape);
         mesh.generate_tangents().unwrap();
         if let Some(Indices::U16(indices)) = mesh.indices() {
@@ -116,7 +143,17 @@ fn setup(
         let mut entity = commands.spawn((
             Mesh3d(mesh.clone()),
             MeshMaterial3d(materials.add(StandardMaterial {
-                base_color: colour,
+                base_color: if settings.unlit && index == 0 {
+                    Color::srgb_u8(128, 32, 32)
+                } else {
+                    colour
+                },
+                unlit: settings.unlit && index == 0,
+                opaque_render_method: if settings.forward {
+                    OpaqueRendererMethod::Forward
+                } else {
+                    OpaqueRendererMethod::Auto
+                },
                 ..default()
             })),
             Transform::from_translation(position),
