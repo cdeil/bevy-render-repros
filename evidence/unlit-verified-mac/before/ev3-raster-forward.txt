@@ -1,0 +1,3 @@
+Procedural cube and floor; no downloaded assets; output=$RUN_ROOT/before/ev3-raster-forward.png
+160 updates completed; screenshot saved; solari=false
+2026-10-10 19:20:14.965 bevy-scene-solari-dispatch-struct[9153:26999423] Metal API Validation Enabled
