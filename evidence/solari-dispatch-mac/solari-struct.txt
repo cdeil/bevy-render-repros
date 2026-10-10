@@ -1,0 +1,7 @@
+Procedural cube and floor; no downloaded assets; output=$RUN_ROOT/solari-struct.png
+160 updates completed; screenshot saved; solari=true
+2026-10-10 18:29:23.244 bevy-scene-solari-dispatch-struct[68330:26745468] Metal API Validation Enabled
+2026-10-10T16:29:23.939939Z  WARN bevy_shader::shader_cache: Shader `embedded://bevy_solari/realtime/presample_light_tiles.wesl` has an unresolved import:
+error: module not found: `bevy_solari::scene::sampling` (no shader registered for this module path)
+  |
+  = note: in unknown module

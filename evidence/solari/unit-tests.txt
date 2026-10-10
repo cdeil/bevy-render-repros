@@ -1,0 +1,7 @@
+running 4 tests
+test scene::binder::tlas::tests::tlas_capacity_grows_geometrically_at_boundaries ... ok
+test scene::binder::lights::tests::light_index_keeps_sources_on_the_same_entity_independent ... ok
+test scene::binder::allocator::tests::index_allocator_reuses_released_slots_without_growing ... ok
+test scene::binder::allocator::tests::retained_binding_array_only_dirties_on_binding_changes ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
