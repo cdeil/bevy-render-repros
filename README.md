@@ -1,142 +1,28 @@
 # Rendering reproducers
 
-Small original Rust examples, procedural geometry and captured GPU output.
-These examples are prepared for independent review; no submission has been made
-to Bevy or wgpu. Build products
-and raw crash logs belong outside this checkout. The current examples require
-Rust 1.97.1 or later.
+Original procedural Rust/Swift examples, small GPU captures and proposed patches for review. No upstream submission has been made. The numbered reports give the conclusion, reproduction command, patch, evidence and limits for each candidate.
 
-**All review notes, documentation patches and code comments in patches are
-technical drafts prepared with AI assistance.** Under Bevy's AI policy they are
-not submission text: before anything is submitted, a human contributor must
-understand the change and write any issue, PR, comment or documentation prose
-independently. See [Review and publication](#review-and-publication).
+| Candidate | Prepared contribution | Runner |
+| --- | --- | --- |
+| [Metal dispatch](review/01-metal-storage.md) | Struct fix; existing wgpu #5739 | `run_vec3_matrix.py`, `run_bevy_cases.py` |
+| [Unlit color](review/02-unlit-material.md) | Primary-visibility composition fix; Bevy #26083 | `run_unlit_matrix.py` |
 
-## Runs and evidence
+## Build and run
 
-Every matrix script writes to a **new** run folder, given with `--out` or by
-default `$REPRO_DATA/runs/<name>-<host>-<UTC time>` (with `REPRO_DATA` defaulting
-to `~/data/bevy-render-repros`). Scripts refuse an existing folder and any folder
-inside this checkout, so recorded evidence is never rewritten. A reviewed run is
-added to `evidence/` under a new name by an explicit copy, next to the earlier
-records. Logs replace local paths with `$RUN_ROOT`, `$REPRO_REPO`,
-`$CARGO_TARGET_DIR` and `~`. On macOS, Metal API validation is recorded from the
-Metal runtime's own `Metal API Validation Enabled` log line; on Linux it is
-recorded as not applicable.
+Rust 1.97.1+, Cargo and uv are required. Raytracing cases need supported hardware; MetalFX execution needs a supported Mac/device/SDK. Clone this repository under `~/code/oss/`; the optional MetalFX consumer expects a sibling `ushas` clone.
 
-## 1. Metal top-level vec3 storage
-
-Existing exact report: https://github.com/gfx-rs/wgpu/issues/5739.
-Do not open a duplicate issue. The useful next contribution is updated evidence
-and, if needed, a narrowly scoped workaround in a downstream renderer.
-
-```bash
-export CARGO_TARGET_DIR="${REPRO_DATA:-$HOME/data/bevy-render-repros}/cache/cargo-target"
-cargo build --release --locked -p wgpu-vec3-repro
-MTL_DEBUG_LAYER=1 "$CARGO_TARGET_DIR/release/wgpu-vec3-repro"
-MTL_DEBUG_LAYER=1 "$CARGO_TARGET_DIR/release/wgpu-vec3-repro" --padded
-MTL_DEBUG_LAYER=1 "$CARGO_TARGET_DIR/release/wgpu-vec3-repro" --scalars
-MTL_DEBUG_LAYER=1 "$CARGO_TARGET_DIR/release/wgpu-vec3-repro" --array --indirect
+```sh
+export REPRO_DATA="$HOME/data/bevy-render-repros"
+export CARGO_TARGET_DIR="$REPRO_DATA/cache/cargo-target"
+cargo build --release --locked --workspace
+uv run --script build_solari_variants.py --out "$REPRO_DATA/runs/variants-new"
+uv run --script run_bevy_cases.py "$REPRO_DATA/runs/variants-new" --out "$REPRO_DATA/runs/solari-new"
 ```
 
-The direct storage vector requests its WGSL size of 12 bytes. The padded case
-allocates 16. The scalar struct and `array<u32, 3>` also occupy 12 bytes and
-isolate vector translation from a generic buffer problem. Successful runs read
-back and assert the first three words. `--indirect` then uses those words as
-indirect dispatch arguments and asserts that exactly 1 × 2 × 3 = 6 workgroups ran.
-The padded case prints a fourth canary word; this helps inspect writes but is not
-a proof of arbitrary backend memory safety.
-
-Use `--signed` or `--float` for the other 32-bit scalar types. Use
-`--msl <output.metal> --translate-only` to inspect standalone Naga output without
-requiring a GPU. That translation uses default options and fake resource slots;
-actual dispatch uses wgpu's normal resource mapping and compile options.
-`uv run --script run_vec3_matrix.py` runs every case with both wgpu builds.
-
-`upstream/Cargo.toml` runs the same original code against a sibling `wgpu`
-checkout. See the evidence record for the exact tested revision. It deliberately
-contains path dependencies so no fork or public GitHub changes are needed.
-
-## Procedural Bevy scene
-
-```bash
-cargo build --release --locked -p bevy-scene-repro
-MTL_DEBUG_LAYER=1 "$CARGO_TARGET_DIR/release/bevy-scene-repro" \
-  --out /absolute/scratch/raster.png --raster
-MTL_DEBUG_LAYER=1 "$CARGO_TARGET_DIR/release/bevy-scene-repro" \
-  --out /absolute/scratch/solari.png
-```
-
-One cube, one floor and one directional light; no GLB, external textures, DLSS,
-downloads or window. The program requests an image screenshot after 100
-updates and verifies it exists after 160. Raster provides a control. Packet 2
-adds `--unlit`, `--ev`, `--restir`, `--forward`, `--deferred` (deferred raster
-control), `--texture`, `--color r,g,b` and `--lit-cube`.
-
-The proposed downstream change is `patches/solari-dispatch-indirect-args.patch`:
-it binds the dispatch buffer as a module-local `DispatchIndirectArgs` struct with
-the same `x, y, z: u32` layout as the copies Bevy's meshlet shaders declare, so
-the 12-byte allocation no longer depends on how Naga translates `vec3`.
-`patches/solari-metal-dispatch-padding.patch` is kept as a clearly marked
-**fallback** that only enlarges the allocation to 16 bytes.
-
-`build_solari_variants.py` builds this scene against patched copies of the
-released `bevy_solari` 0.20.0 crate from Cargo's registry; no Bevy checkout is
-needed or modified. It checks embedded WGSL marker text: the struct and unlit
-changes must be present exactly where applied. The padding fallback changes only
-Rust, so markers can only show that it carries neither WGSL change; its effect is
-shown by its Metal behaviour. The script records each binary's SHA-256 and keeps
-copies of the binaries in its run folder.
-
-```bash
-cargo build --release --locked -p bevy-scene-repro
-uv run --script build_solari_variants.py --out /new/variants
-uv run --script run_bevy_cases.py /new/variants --out /new/solari-cases
-```
-
-See [technical findings](review/01-metal-storage.md) and
-`evidence/solari-dispatch-mac/` / `-linux/`. The unpatched Solari control aborts
-before screenshot capture on Metal. The original allocation-patch run against a
-sibling Bevy checkout (`bevy-patched/Cargo.toml`) is kept in `evidence/solari/`.
+Each report supplies its specific command. Every runner requires a new output directory outside this checkout. Selected screenshots/logs/results in `evidence/` are immutable records; binaries and large raw data stay in the external data directory. Logs replace local paths. Metal validation is confirmed from runtime output; Linux records normal wgpu/readback coverage, without Khronos API layers. No Windows coverage is claimed.
 
 ## Review and publication
 
-Bevy's policy prohibits AI-generated public prose and requires human ownership
-and disclosure for code assistance. wgpu does not accept fully agentic PRs.
-The evidence here supports independent technical review. A human needs to
-understand the changes and independently write any eventual public Bevy issue
-or PR description; do not paste these notes upstream. The same applies to the
-documentation text and code comments inside `patches/`: each patch header marks
-it as a technical draft, and that wording must be rewritten by the human
-contributor before any submission.
+These reports, documentation patches and code comments are AI-assisted technical drafts, not text to submit to Bevy. Human code ownership, independently written Bevy prose and explicit publication approval remain required. See [publication requirements](PUBLICATION.md) and [patch-context licenses](THIRD_PARTY_NOTICES.md).
 
-Sources: https://bevy.org/learn/contribute/policies/ai/ and
-https://github.com/gfx-rs/wgpu/blob/trunk/CONTRIBUTING.md.
-
-## 2. Deferred unlit colors
-
-See [unlit findings and patch commands](review/02-unlit-material.md).
-The matrix compares original and patched Solari with **deferred raster**, the
-exact reference, at three exposures with both ReSTIR settings, plus textured and
-saturated colors, a lit-material regression control and a forward-materials
-control in which Solari is bypassed. The patch fixes primary visibility only;
-secondary rays and the path tracer still treat unlit surfaces as lit.
-
-![Actual Metal captures: forward raster, deferred raster, original, patched](evidence/unlit-controls-mac/comparison.png)
-![Actual Vulkan captures: forward raster, deferred raster, original, patched](evidence/unlit-controls-linux/comparison.png)
-
-Before any upstream push, inspect the proposed commits, their author and
-committer, and every changed line:
-
-```sh
-git log --format=fuller <upstream-base>..HEAD
-git log -p --format=%B <upstream-base>..HEAD \
-  | rg -i 'co-authored-by|generated with|assisted-by|claude|codex|copilot|anthropic|openai|gemini|🤖|technical draft|ai assistance'
-```
-
-Review every match in context: legitimate crate names or code can also match.
-Remove agent co-author trailers, tool footers and technical-draft patch headers
-from the proposed upstream commits. Preserve any independently human-written
-assistance disclosure required by the target project. Independently human-write
-all eventual Bevy prose, including rustdoc and explanatory comments; human code
-ownership and submission approval are still required.
+The owned review PRs form a stack; review each against its stated base. Historical evidence remains available in Git and older evidence folders; the reports link the relevant current results.
