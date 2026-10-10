@@ -3,6 +3,7 @@ use bevy::{
     core_pipeline::tonemapping::{DebandDither, Tonemapping},
     mesh::{
         Indices, VertexAttributeValues,
+        morph::{MeshMorphWeights, MorphAttributes},
         skinning::{SkinnedMesh, SkinnedMeshInverseBindposes},
     },
     prelude::*,
@@ -29,9 +30,15 @@ fn main() {
     let args: Vec<_> = std::env::args().collect();
     let mode = args
         .get(1)
-        .expect("<native|bind-copy|baked> <angle> <new.png> [--ray]")
+        .expect("<mode> <angle> <new.png> [--ray]")
         .clone();
-    assert!(matches!(mode.as_str(), "native" | "bind-copy" | "baked"));
+    // extra-attr: unskinned mesh with one extra COLOR attribute.
+    // morph: exactly the four attributes plus a morph target equal to the baked pose.
+    // bind-copy-offset: bind-pose ray copy on a skinned entity translated by +1 x.
+    assert!(matches!(
+        mode.as_str(),
+        "native" | "bind-copy" | "baked" | "extra-attr" | "morph" | "bind-copy-offset"
+    ));
     let angle = args.get(2).expect("angle radians").parse().unwrap();
     let output = args.get(3).expect("new output").clone();
     let ray = args.iter().any(|s| s == "--ray");
@@ -145,12 +152,49 @@ fn setup(
             }
         }
     }
+    let mut extra = base.clone();
+    extra.insert_attribute(Mesh::ATTRIBUTE_COLOR, vec![[1.0f32; 4]; upper.len()]);
+    let mut morph = base.clone();
+    let (
+        Some(VertexAttributeValues::Float32x3(positions)),
+        Some(VertexAttributeValues::Float32x3(normals)),
+    ) = (
+        base.attribute(Mesh::ATTRIBUTE_POSITION),
+        base.attribute(Mesh::ATTRIBUTE_NORMAL),
+    )
+    else {
+        unreachable!()
+    };
+    // One morph target whose full weight reproduces the baked pose; tangents unchanged.
+    morph.set_morph_targets(
+        positions
+            .iter()
+            .zip(normals)
+            .zip(&upper)
+            .map(|((p, n), &u)| {
+                let (p, n) = (Vec3::from_array(*p), Vec3::from_array(*n));
+                if u {
+                    MorphAttributes::new(rotation * p - p, rotation * n - n, Vec3::ZERO)
+                } else {
+                    MorphAttributes::new(Vec3::ZERO, Vec3::ZERO, Vec3::ZERO)
+                }
+            })
+            .collect(),
+    );
     let (raster, ray_mesh) = match settings.mode.as_str() {
         "native" => {
             let handle = meshes.add(skin);
             (handle.clone(), handle)
         }
-        "bind-copy" => (meshes.add(skin), meshes.add(base)),
+        "bind-copy" | "bind-copy-offset" => (meshes.add(skin), meshes.add(base)),
+        "extra-attr" => {
+            let handle = meshes.add(extra);
+            (handle.clone(), handle)
+        }
+        "morph" => {
+            let handle = meshes.add(morph);
+            (handle.clone(), handle)
+        }
         "baked" => {
             let handle = meshes.add(baked);
             (handle.clone(), handle)
@@ -166,11 +210,24 @@ fn setup(
                 emissive: LinearRgba::new(0.5, 0.0, 0.0, 1.0),
                 ..default()
             })),
-            Transform::default(),
+            // Skinning ignores this transform; the ray-traced copy is placed by it.
+            if settings.mode == "bind-copy-offset" {
+                Transform::from_xyz(1.0, 0.0, 0.0)
+            } else {
+                Transform::default()
+            },
             NoFrustumCulling,
         ))
         .id();
-    if settings.mode != "baked" {
+    if settings.mode == "morph" {
+        commands
+            .entity(entity)
+            .insert(MeshMorphWeights::Value { weights: vec![1.0] });
+    }
+    if matches!(
+        settings.mode.as_str(),
+        "native" | "bind-copy" | "bind-copy-offset"
+    ) {
         let joint0 = commands.spawn(Transform::IDENTITY).id();
         let joint1 = commands.spawn(Transform::from_rotation(rotation)).id();
         // Independent original fixture: identity bind poses, upper vertices fully on joint 1.

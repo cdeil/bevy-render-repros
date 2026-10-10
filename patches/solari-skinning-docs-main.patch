@@ -1,21 +1,32 @@
 Adapted from bevyengine/bevy@0e93c7ab7d5ec016990dcb226ec544aee1636d70 (MIT);
 source paths are listed in the diff, original change is described in review/.
 License and notices: THIRD_PARTY_NOTICES.md and LICENSES/bevy-MIT.txt.
+TECHNICAL DRAFT prepared with AI assistance. Its code comments and documentation
+text are not submission prose: under Bevy's AI policy a human contributor must
+understand the change and independently write any prose before submission.
 
+diff --git a/crates/bevy_solari/src/scene/types.rs b/crates/bevy_solari/src/scene/types.rs
+index f0d6138..94189c9 100644
 --- a/crates/bevy_solari/src/scene/types.rs
 +++ b/crates/bevy_solari/src/scene/types.rs
-@@ -12,8 +12,13 @@
+@@ -12,9 +12,19 @@ use derive_more::derive::From;
  ///
  /// The mesh used in this component must declare the BLAS its material needs in
  /// [`Mesh::raytracing`],
 -/// use the following set of vertex attributes: `{POSITION, NORMAL, UV_0, TANGENT}`, use [`bevy_mesh::PrimitiveTopology::TriangleList`],
-+/// use exactly the following set of vertex attributes: `{POSITION, NORMAL, UV_0, TANGENT}`, use [`bevy_mesh::PrimitiveTopology::TriangleList`],
++/// use exactly the following set of vertex attributes, in their default formats: `{POSITION, NORMAL, UV_0, TANGENT}`, use [`bevy_mesh::PrimitiveTopology::TriangleList`],
  /// and use [`bevy_mesh::Indices::U32`].
-+///
-+/// Skinned and morphed meshes are not supported. Additional vertex attributes,
-+/// including joint indices and weights, make a mesh incompatible. A separate
-+/// compatible mesh can represent a static pose, but it does not automatically
-+/// follow skinning or morph deformation on this entity.
  ///
++/// Meshes that do not meet these requirements are skipped without a warning.
++/// Skinned meshes are skipped because joint indices and weights are additional
++/// vertex attributes. Morph targets are not vertex attributes and are ignored:
++/// a compatible morphed mesh is ray traced in its unmorphed base shape.
++///
++/// A separate compatible mesh can represent a static pose, but it does not follow
++/// later skinning or morph changes. It is placed by this entity's transform, which
++/// skinning does not apply, so a pose baked from joint matrices must be expressed
++/// in this entity's local space.
++///
  /// The material used for this entity must be [`MeshMaterial3d<StandardMaterial>`].
  #[derive(
+     Component, FromTemplate, Clone, Debug, Default, Deref, DerefMut, Reflect, PartialEq, Eq, From,
