@@ -1,0 +1,7 @@
+Procedural cube and floor; no downloaded assets; output=$REPRO_REPO/evidence/unlit-mac/after/solari-restir0-ev3.png
+160 updates completed; screenshot saved; solari=true
+2026-10-10 16:49:56.704 bevy-scene-patched-repro[27451:26495759] Metal API Validation Enabled
+2026-10-10T14:49:56.749020Z  WARN bevy_shader::shader_cache: Shader `embedded://bevy_solari/realtime/presample_light_tiles.wesl` has an unresolved import:
+error: module not found: `bevy_solari::scene::sampling` (no shader registered for this module path)
+  |
+  = note: in unknown module
