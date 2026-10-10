@@ -1,0 +1,3 @@
+adapter=AdapterInfo { name: "Apple M5 Pro", vendor: 0, device: 0, device_type: IntegratedGpu, device_pci_bus_id: "", driver: "", driver_info: "", backend: Metal, subgroup_min_size: 4, subgroup_max_size: 64, transient_saves_memory: Some(true), limit_bucket: None }; size=12; scalar_struct=false; kind=f32; validation=Ok("1")
+2026-10-10 16:23:37.833 wgpu-main-vec3-repro[21640:26454086] Metal API Validation Enabled
+validateComputeFunctionArguments:1070: failed assertion `Compute Function(main_): argument counts[0] from Buffer(0) with offset(0) and length(12) has space for 12 bytes, but argument has a length(16).'

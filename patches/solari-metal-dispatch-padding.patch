@@ -1,0 +1,10 @@
+diff --git a/crates/bevy_solari/src/realtime/prepare.rs b/crates/bevy_solari/src/realtime/prepare.rs
+index 95f52f6..22f3e37 100644
+--- a/crates/bevy_solari/src/realtime/prepare.rs
++++ b/crates/bevy_solari/src/realtime/prepare.rs
+@@ -233,3 +233,4 @@ pub fn prepare_solari_lighting_resources(
+             label: Some("solari_lighting_world_cache_active_cells_dispatch"),
+-            size: size_of::<[u32; 3]>() as u64,
++            // Metal needs 16 bytes for top-level storage vec3 until wgpu #5739 is fixed.
++            size: size_of::<[u32; 4]>() as u64,
+             usage: BufferUsages::INDIRECT | BufferUsages::STORAGE,

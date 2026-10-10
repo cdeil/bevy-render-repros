@@ -1,0 +1,10 @@
+[package]
+name = "wgpu-vec3-repro"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+wgpu = { version = "=30.0.1", default-features = false, features = ["std", "metal", "vulkan", "wgsl"] }
+naga = { version = "=30.0.1", features = ["wgsl-in", "msl-out"] }
+pollster = "1.0.1"

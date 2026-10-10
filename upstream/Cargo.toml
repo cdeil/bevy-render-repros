@@ -1,0 +1,16 @@
+[workspace]
+
+[package]
+name = "wgpu-main-vec3-repro"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[[bin]]
+name = "wgpu-main-vec3-repro"
+path = "../wgpu-vec3/src/main.rs"
+
+[dependencies]
+wgpu = { path = "../../wgpu/wgpu", default-features = false, features = ["std", "metal", "vulkan", "wgsl"] }
+naga = { path = "../../wgpu/naga", features = ["wgsl-in", "msl-out"] }
+pollster = "1.0.1"

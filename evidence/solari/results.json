@@ -1,0 +1,20 @@
+[
+  {
+    "case": "raster",
+    "returncode": 0,
+    "shell_exit": 0,
+    "screenshot": true
+  },
+  {
+    "case": "solari",
+    "returncode": -6,
+    "shell_exit": 134,
+    "screenshot": false
+  },
+  {
+    "case": "solari-padded",
+    "returncode": 0,
+    "shell_exit": 0,
+    "screenshot": true
+  }
+]
