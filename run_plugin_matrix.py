@@ -4,25 +4,27 @@
 # ///
 """Actual output checks for the prepared Bevy 0.20 upscaler port."""
 
+import argparse
 import json
 import os
 import subprocess
-import sys
 from pathlib import Path
-
 import numpy as np
 from PIL import Image, ImageDraw
+from repro_run import MAC as mac
+from repro_run import fresh_root, require_validation, sanitize
 
-root = Path(__file__).resolve().parent
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--out", help="new folder (default: timestamped, outside the checkout)"
+)
+args = parser.parse_args()
 binary = Path(os.environ["CARGO_TARGET_DIR"]) / "release/metalfx-plugin-repro"
-mac = sys.platform == "darwin"
-evidence = root / "evidence" / ("metalfx-plugin" if mac else "metalfx-plugin-linux")
-evidence.mkdir(parents=True, exist_ok=True)
+evidence = fresh_root(args.out, "metalfx-plugin")
 images = {}
 records = {}
 for mode in ("disabled", "spatial", "temporal"):
     output = evidence / f"{mode}.png"
-    output.unlink(missing_ok=True)
     command = [str(binary), mode, str(output)]
     if not mac and mode != "disabled":
         command.append("--expect-unavailable")
@@ -34,7 +36,7 @@ for mode in ("disabled", "spatial", "temporal"):
         timeout=90,
         check=False,
     )
-    log = (result.stdout + result.stderr).replace(str(root), "$REPRO_REPO")
+    log = sanitize(result.stdout + result.stderr, evidence)
     output.with_suffix(".txt").write_text(log)
     assert result.returncode == 0 and "Completed screenshot readback" in log, log
     if mode != "disabled":
@@ -44,7 +46,7 @@ for mode in ("disabled", "spatial", "temporal"):
     images[mode] = rgb
     record = {
         "returncode": result.returncode,
-        "metal_api_validation": mac,
+        "metal_api_validation": require_validation(log),
         "native_upscaler_executed": mac and mode != "disabled",
     }
     if mode != "disabled":

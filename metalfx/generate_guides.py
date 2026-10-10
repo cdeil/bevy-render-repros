@@ -4,14 +4,13 @@
 # ///
 """Original analytic sphere/rod/plane fixture with seeded radiance noise.
 
-A functional MetalFX guide/scene-cut diagnostic, not a physical path-tracer or
+A functional MetalFX guide/history-reset diagnostic, not a physical path-tracer or
 an image-quality benchmark. Static camera and objects mean motion is zero.
 """
 
 import argparse
 import json
 from pathlib import Path
-
 import numpy as np
 
 parser = argparse.ArgumentParser()
@@ -118,4 +117,6 @@ for frame in range(frames):
     (args.output / f"{frame:04d}-reference.bin").write_bytes(
         clean.astype("<f4").tobytes()
     )
-print(f"Generated {frames} analytic frames, cut/reset at frame 16; {width}x{height}")
+print(
+    f"Generated {frames} analytic frames, object teleport/reset at frame 16; {width}x{height}"
+)
