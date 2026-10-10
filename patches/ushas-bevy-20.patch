@@ -1,0 +1,177 @@
+Prepared migration from mistakeknot/ushas@717a240038e9ee41ecec39591bed40f1240bd8eb
+(MIT; Copyright (c) 2026 General Systems Ventures). Files are named below.
+Changes: Bevy 0.20/wgpu 30 APIs, fallible readback and existing GPU test setup.
+See THIRD_PARTY_NOTICES.md and LICENSES/ushas-MIT.txt. Review only.
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 6f8f1f3..dadb5bb 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -10,5 +10,5 @@ keywords = ["bevy", "metalfx", "upscaling", "apple", "metal"]
+ categories = ["game-engines", "rendering", "graphics"]
+-# Forced by bevy 0.19 / bevy_ecs 0.19, which require 1.95.0. Nothing in this
++# Forced by bevy 0.20 / bevy_ecs 0.20, which require 1.97.1. Nothing in this
+ # crate's own code needs it.
+-rust-version = "1.95"
++rust-version = "1.97.1"
+ readme = "README.md"
+@@ -45,3 +45,3 @@ diagnostic-fault-injection = ["temporal"]
+ [dependencies]
+-bevy = { version = "0.19", default-features = false, features = [
++bevy = { version = "0.20", default-features = false, features = [
+   "bevy_camera",
+@@ -55,4 +55,4 @@ log = "0.4"
+ # wgpu + wgpu-hal for raw Metal device/texture/cmdbuf extraction via as_hal
+-wgpu = "29"
+-wgpu-hal = { version = "29", features = ["metal"] }
++wgpu = "30"
++wgpu-hal = { version = "30", features = ["metal"] }
+ # foreign-types is gone as of 0.4: wgpu-hal 29 migrated its Metal handles from
+diff --git a/src/adaptive_runtime.rs b/src/adaptive_runtime.rs
+index b8078f9..df5f3ff 100644
+--- a/src/adaptive_runtime.rs
++++ b/src/adaptive_runtime.rs
+@@ -222,3 +222,5 @@ impl MetalFxAdaptiveContext {
+ 
+-impl bevy::render::extract_resource::ExtractResource for MetalFxAdaptiveContext {
++impl bevy::render::extract_resource::ExtractResource<bevy::render::RenderApp>
++    for MetalFxAdaptiveContext
++{
+     type Source = Self;
+@@ -404,3 +406,3 @@ pub(crate) fn install(app: &mut App, enabled: bool) {
+                 bevy::render::ExtractSchedule,
+-                extract_resource::<MetalFxAdaptiveContext, ()>,
++                extract_resource::<MetalFxAdaptiveContext, bevy::render::RenderApp, ()>,
+             );
+diff --git a/src/diagnostic_fault.rs b/src/diagnostic_fault.rs
+index 16364e1..695f638 100644
+--- a/src/diagnostic_fault.rs
++++ b/src/diagnostic_fault.rs
+@@ -38,2 +38,3 @@ pub struct ScalerFaultSnapshot {
+ #[derive(Resource, ExtractResource, Debug, Clone, Default)]
++#[extract_app(bevy::render::RenderApp)]
+ pub struct MetalFxDiagnosticFault {
+diff --git a/src/effect_runtime.rs b/src/effect_runtime.rs
+index febe502..e950059 100644
+--- a/src/effect_runtime.rs
++++ b/src/effect_runtime.rs
+@@ -18,2 +18,3 @@ use crate::{MetalFxEffectStatus, MetalFxMode};
+ #[derive(Resource, Clone, Copy, Default, ExtractResource)]
++#[extract_app(bevy::render::RenderApp)]
+ pub struct MetalFxObservationFrame(pub u64);
+@@ -22,2 +23,3 @@ pub struct MetalFxObservationFrame(pub u64);
+ #[derive(Resource, Clone, Copy, ExtractResource)]
++#[extract_app(bevy::render::RenderApp)]
+ pub(crate) struct MetalFxRequestedEffect {
+@@ -28,3 +30,3 @@ pub(crate) struct MetalFxRequestedEffect {
+ 
+-impl ExtractResource for MetalFxEffectStatus {
++impl ExtractResource<bevy::render::RenderApp> for MetalFxEffectStatus {
+     type Source = Self;
+diff --git a/src/frame_timing.rs b/src/frame_timing.rs
+index c445032..03c0b0e 100644
+--- a/src/frame_timing.rs
++++ b/src/frame_timing.rs
+@@ -745,3 +745,3 @@ pub fn harvest(
+             Phase::Mapping(mapped) if mapped.status.load(Ordering::Acquire) != 0 => {
+-                let success = mapped.status.load(Ordering::Acquire) == 1;
++                let mut success = mapped.status.load(Ordering::Acquire) == 1;
+                 slot.stages.mapping_callback_after = mapped.observed_after();
+@@ -749,8 +749,12 @@ pub fn harvest(
+                 if success {
+-                    let bytes = slot.readback.get_mapped_range(..);
+-                    for (output, bytes) in ticks.iter_mut().zip(bytes.chunks_exact(8)) {
+-                        *output = u64::from_le_bytes(bytes.try_into().unwrap());
++                    match slot.readback.get_mapped_range(..) {
++                        Ok(bytes) => {
++                            for (output, bytes) in ticks.iter_mut().zip(bytes.as_chunks::<8>().0) {
++                                *output = u64::from_le_bytes(*bytes);
++                            }
++                            drop(bytes);
++                            slot.readback.unmap();
++                        }
++                        Err(_) => success = false,
+                     }
+-                    drop(bytes);
+-                    slot.readback.unmap();
+                 }
+diff --git a/src/history.rs b/src/history.rs
+index 57856be..b945779 100644
+--- a/src/history.rs
++++ b/src/history.rs
+@@ -64,3 +64,3 @@ impl MetalFxHistoryReset {
+ 
+-impl ExtractResource for MetalFxHistoryReset {
++impl ExtractResource<bevy::render::RenderApp> for MetalFxHistoryReset {
+     type Source = Self;
+diff --git a/src/lib.rs b/src/lib.rs
+index 4668bbd..bc4b60f 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -78,2 +78,3 @@ mod stub {
+     #[derive(Resource, Clone, Copy, bevy::render::extract_resource::ExtractResource)]
++    #[extract_app(bevy::render::RenderApp)]
+     pub struct MetalFxConfig {
+diff --git a/src/node.rs b/src/node.rs
+index e30cc55..f805456 100644
+--- a/src/node.rs
++++ b/src/node.rs
+@@ -132,2 +132,3 @@ use crate::{
+ #[derive(Resource, Clone, Copy, bevy::render::extract_resource::ExtractResource)]
++#[extract_app(bevy::render::RenderApp)]
+ pub struct MetalFxConfig {
+@@ -152,2 +153,3 @@ pub struct MetalFxConfig {
+ #[derive(Resource, Clone, Copy, bevy::render::extract_resource::ExtractResource)]
++#[extract_app(bevy::render::RenderApp)]
+ pub struct MetalFxFrameTiming {
+@@ -374,2 +376,3 @@ pub fn metalfx_upscale(
+         &'static ViewTarget,
++        Option<&'static bevy::render::view::ResolvedCompositingSpace>,
+         Option<&'static MainPassResolutionOverride>,
+@@ -455,2 +458,3 @@ impl MetalFxUpscaleNode {
+             target,
++            compositing_space,
+             resolution_override,
+@@ -463,2 +467,3 @@ impl MetalFxUpscaleNode {
+             &ViewTarget,
++            Option<&bevy::render::view::ResolvedCompositingSpace>,
+             Option<&MainPassResolutionOverride>,
+@@ -564,3 +569,6 @@ impl MetalFxUpscaleNode {
+         } else {
+-            match crate::platform::scaler_color_processing(main_format, target.compositing_space) {
++            match crate::platform::scaler_color_processing(
++                main_format,
++                bevy::render::view::ResolvedCompositingSpace::space(compositing_space),
++            ) {
+                 Ok(processing) => processing,
+diff --git a/src/node/resolve.rs b/src/node/resolve.rs
+index 06350d0..2f055da 100644
+--- a/src/node/resolve.rs
++++ b/src/node/resolve.rs
+@@ -23,3 +23,3 @@ mod tests {
+     use bevy::render::render_resource::{Texture, TextureDescriptor, TextureViewDescriptor};
+-    use bevy::render::renderer::{PendingCommandBuffers, WgpuWrapper};
++    use bevy::render::renderer::PendingCommandBuffers;
+ 
+@@ -28,2 +28,3 @@ mod tests {
+     fn resolve_bindings_reuse_source_texture_and_invalidate_on_replacement() {
++        bevy::tasks::ComputeTaskPool::get_or_init(bevy::tasks::TaskPool::new);
+         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
+@@ -36,3 +37,3 @@ mod tests {
+             .expect("Metal device required");
+-        let device = RenderDevice::new(WgpuWrapper::new(raw));
++        let device = RenderDevice::new(raw);
+         let texture = |format| -> Texture {
+@@ -77,3 +78,3 @@ mod tests {
+                     system.apply(world);
+-                    queue.submit(world.resource_mut::<PendingCommandBuffers>().take());
++                    queue.submit(world.resource_mut::<PendingCommandBuffers>().finish());
+                     if motion {
+diff --git a/src/present/resource.rs b/src/present/resource.rs
+index 1c81555..8382e67 100644
+--- a/src/present/resource.rs
++++ b/src/present/resource.rs
+@@ -21,2 +21,3 @@ use super::PresentSink;
+ #[derive(bevy::prelude::Resource, Clone, bevy::render::extract_resource::ExtractResource)]
++#[extract_app(bevy::render::RenderApp)]
+ pub struct MetalFxDualPresent {

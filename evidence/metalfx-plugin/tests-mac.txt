@@ -1,0 +1,159 @@
+   Compiling bevy_metalfx v0.5.0-rc.1 ($UPSTREAM)
+warning: use of deprecated associated function `bevy::bevy_math::Mat4::perspective_infinite_reverse_rh`: use the `glam::camera::rh::proj::directx::perspective_infinite_reverse` function instead
+  --> src/jitter.rs:87:23
+   |
+87 |                 Mat4::perspective_infinite_reverse_rh(60.0_f32.to_radians(), size.x / size.y, 0.1);
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> src/history.rs:37:14
+   |
+37 |             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |generation| {
+   |              ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+37 -             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |generation| {
+37 +             .try_update(Ordering::AcqRel, Ordering::Acquire, |generation| {
+   |
+
+warning: `bevy_metalfx` (lib test) generated 2 warnings (run `cargo fix --lib -p bevy_metalfx --tests` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 3.95s
+     Running unittests src/lib.rs ($CARGO_TARGET_DIR/release/deps/bevy_metalfx-54766e314a5b4b60)
+
+running 130 tests
+test adaptive::tests::missing_unvalidated_and_invalid_samples_hold_quality ... ok
+test adaptive::tests::stale_future_duplicate_and_mismatched_samples_cannot_accumulate_evidence ... ok
+test adaptive::tests::slow_cpu_cadence_with_gpu_headroom_never_lowers_quality ... ok
+test adaptive::tests::overload_during_evidence_window_is_not_reported_within_budget ... ok
+test adaptive::tests::pause_and_pending_effect_clear_old_overload_evidence ... ok
+test adaptive::tests::brief_spike_and_near_budget_noise_do_not_change_scale ... ok
+test adaptive::tests::decision_intervals_are_seconds_not_frame_counts ... ok
+test adaptive::tests::scaler_rebuild_preserves_the_downshift_benefit_check ... ok
+test adaptive::tests::ineffective_downshift_restores_quality_and_stops_descent ... ok
+test adaptive::tests::reports_infeasible_at_quality_floor_and_never_crosses_it ... ok
+test adaptive::tests::lower_gpu_workload_reopens_a_previously_failed_higher_rung ... ok
+test adaptive::tests::validates_configuration_and_quality_floor ... ok
+test adaptive::tests::headroom_can_raise_quality_but_does_not_repeat_failed_upward_trials ... ok
+test adaptive::tests::target_and_floor_changes_clear_evidence_and_apply_new_policy ... ok
+test adaptive::tests::workload_recovery_uses_a_higher_rung_that_now_meets_budget ... ok
+test adaptive::tests::sustained_gpu_pressure_converges_at_60_and_120_hz ... ok
+test control_upscale::tests::crop_uses_actual_content_extent_without_applying_scale_twice ... ok
+test control_upscale::tests::fallback_requires_this_frames_success_before_skipping_reconstruction ... ok
+test control_upscale::tests::invalid_content_cannot_be_copied_or_reported_as_a_control ... ok
+test control_upscale::tests::native_extent_needs_no_extra_pass ... ok
+test diagnostic_fault::tests::default_fault_does_not_replace_real_creation ... ok
+test diagnostic_fault::tests::injected_failure_is_a_real_empty_creation_result ... ok
+test diagnostic_fault::tests::held_attempt_stays_pending_until_its_owner_releases_it ... ok
+test diagnostic_fault::tests::release_changes_generation_without_mutating_extracted_identity ... ok
+test effect::tests::delayed_events_within_a_frame_cannot_replace_later_events ... ok
+test effect::tests::delayed_old_frames_cannot_replace_newer_observations ... ok
+test effect::tests::events_with_equal_clock_timestamps_keep_creation_order ... ok
+test effect::tests::future_observations_are_not_fresh_for_an_earlier_frame ... ok
+test effect::tests::missing_and_stale_views_do_not_report_active_output ... ok
+test effect::tests::new_frame_fallback_replaces_previous_output ... ok
+test effect::tests::pending_encoded_and_output_written_are_distinct_observations ... ok
+test effect::tests::readers_accept_only_explicit_frame_lag_and_wall_age_bounds ... ok
+test effect::tests::resource_clones_share_observations_without_mixing_views ... ok
+test effect::tests::retained_views_are_bounded_and_old_publications_cannot_evict_newer_views ... ok
+test control_upscale::tests::installation_tolerates_headless_and_minimal_render_apps ... ok
+test effect_runtime::tests::bypass_and_unavailable_are_explicitly_distinct ... ok
+test effect_runtime::tests::compiled_modes_never_choose_a_missing_feature ... ok
+test effect_runtime::tests::content_size_reports_the_rendered_override_and_rejects_invalid_layouts ... ok
+test effect_runtime::tests::inactive_observer_preserves_a_reduced_controls_terminal_decision ... ok
+test effect_runtime::tests::scaler_scope_fails_closed_when_the_view_is_missing_or_ambiguous ... ok
+test frame_timing::tests::acceptance_requires_complete_fresh_non_overlapping_queries ... ok
+test frame_timing::tests::callback_telemetry_is_missing_until_the_callback_runs ... ok
+test frame_timing::tests::delayed_results_keep_the_configuration_and_frame_that_encoded_them ... ok
+test frame_timing::tests::disabled_control_timing_uses_the_rendered_content_and_scale ... ok
+test frame_timing::tests::history_is_bounded_under_an_unread_consumer ... ok
+test frame_timing::tests::invalid_queries_are_missing_not_zero_cost ... ok
+test frame_timing::tests::pending_identity_and_stage_telemetry_survive_a_snapshot ... ok
+test gpu_timing::tests::snapshot_is_push_order_before_wrapping ... ok
+test adaptive_runtime::tests::invalid_policy_holds_scale_and_invalidates_old_measurements ... ok
+test adaptive_runtime::tests::multiple_active_views_do_not_drive_one_global_scale ... ok
+test gpu_timing::tests::snapshot_reports_samples_oldest_first_after_wrapping ... ok
+test adaptive_runtime::tests::disabled_mode_invalidates_measurements_before_reenable ... ok
+test adaptive_runtime::tests::native_content_under_a_half_resolution_request_cannot_drive_adaptation ... ok
+test adaptive_runtime::tests::input_rejects_invalid_provenance_and_orders_each_view_independently ... ok
+test adaptive_runtime::tests::explicit_60_fps_wins_over_monitor_and_only_explicit_changes_reset_evidence ... ok
+test adaptive_runtime::tests::unavailable_monitor_metadata_reports_the_specific_60_fps_fallback ... ok
+test adaptive_runtime::tests::render_frame_context_does_not_follow_the_next_main_frame ... ok
+test adaptive_runtime::tests::default_target_uses_the_primary_windows_current_monitor ... ok
+test adaptive_runtime::tests::monitor_refresh_change_invalidates_a_pending_gpu_sample ... ok
+test effect_runtime::tests::no_render_does_not_become_a_successful_effect ... ok
+test adaptive_runtime::tests::resize_and_explicit_reset_invalidate_old_sample_epoch ... ok
+test history::tests::acknowledgements_arriving_out_of_order_do_not_reopen_consumed_requests ... ok
+test history::tests::default_has_no_requested_reset ... ok
+test history::tests::dropped_encode_token_leaves_the_request_pending ... ok
+test history::tests::extraction_does_not_see_a_request_from_a_later_main_frame ... ok
+test gpu_timing_configuration_tests::default_timing_reuses_one_sink_in_both_worlds ... ok
+test history::tests::inactive_or_unready_frames_cannot_consume_the_request ... ok
+test effect_runtime::tests::effect_surface_exists_without_a_renderer_in_every_mode ... ok
+test history::tests::old_encode_acknowledgement_cannot_consume_a_newer_request ... ok
+test gpu_timing_configuration_tests::explicit_opt_out_removes_even_a_preexisting_or_host_supplied_sink ... ok
+test history::tests::one_encoded_reset_can_coalesce_requests_known_before_extraction ... ok
+test history::tests::successful_encode_consumes_once_across_main_and_render_worlds ... ok
+test jitter::tests::first_samples_match_bevy_taa ... ok
+test jitter::tests::metalfx_jitter_matches_bevy_perspective_screen_displacement ... ok
+test jitter::tests::samples_are_centered_and_in_range ... ok
+test jitter::tests::sequence_is_32_phase ... ok
+test node::encode::tests::command_buffer_reports_encoding_only_after_the_callback_runs ... ok
+test node::encode::tests::missing_command_buffer_does_not_report_encoding ... ok
+test node::encode::tests::missing_raw_command_leaves_reset_pending_for_the_retry ... ok
+test node::encode::tests::spatial_work_cannot_consume_a_temporal_history_reset ... ok
+test node::scaler::tests::cache_invalidates_resize_view_mode_format_and_dynamic_range_changes ... ok
+test node::scaler::tests::failed_or_disconnected_creation_is_not_pending ... ok
+test lifecycle_tests::camera_spawned_after_startup_gets_the_resolution_override ... ok
+test node::scaler::tests::pending_creation_becomes_slow_without_claiming_failure_or_success ... ok
+test lifecycle_tests::device_ladder_change_before_first_frame_keeps_configuration_in_sync ... ok
+test platform::tests::scaler_color_processing_matches_the_actual_render_texture ... ok
+test lifecycle_tests::camera_cut_requested_during_update_persists_without_render_ack ... ok
+test lifecycle_tests::late_temporal_camera_gets_complete_prepass_and_jitter_inputs ... ok
+test platform::tests::scaler_rejects_color_spaces_without_a_matching_metalfx_contract ... ok
+test lifecycle_tests::raising_quality_floor_updates_real_render_inputs_without_gpu_samples ... ok
+test lifecycle_tests::preexisting_motion_prepass_does_not_hide_missing_temporal_inputs ... ok
+test platform::tests::test_format_mapping ... ok
+test adaptive_runtime::tests::policy_floor_syncs_scale_even_without_a_new_gpu_sample ... ok
+test platform::tests::test_metalfx_availability ... ok
+test present::layer::tests::null_pointers_are_rejected_rather_than_dereferenced ... ok
+test present::sink::tests::displayed_counts_every_frame_while_the_ring_saturates ... ok
+test present::sink::tests::dropped_frames_are_counted_without_disturbing_intervals ... ok
+test lifecycle_tests::resize_updates_existing_render_inputs ... ok
+test present::sink::tests::interval_stats_track_a_steady_120hz_cadence ... ok
+test lifecycle_tests::temporal_camera_enforces_msaa_even_with_all_inputs_and_after_settings_change ... ok
+test present::sink::tests::judder_shows_up_as_interval_spread ... ok
+test present::sink::tests::non_advancing_timestamps_count_as_inversions ... ok
+test present::sink::tests::reset_clears_samples_but_keeps_the_scheduling_anchor ... ok
+test present::sink::tests::reset_clears_the_displayed_counter ... ok
+test present::sink::tests::stats_need_two_samples ... ok
+test tests::adaptive_range_tracks_the_governor_ladder ... ok
+test lifecycle_tests::initial_floor_and_preset_snapping_apply_before_first_render_extraction ... ok
+test tests::adaptive_state_snaps_to_the_nearest_allowed_rung ... ok
+test tests::contains_rejects_out_of_band_scales ... ok
+test tests::device_band_is_the_reciprocal_of_the_reported_ratios ... ok
+test tests::history_reset_defaults_to_not_requested ... ok
+test tests::mip_bias_clamps_degenerate_scales ... ok
+test tests::mip_bias_matches_log2_scale ... ok
+test tests::native_scale_is_a_unit_ratio ... ok
+test tests::history_reset_survives_app_updates_without_a_render_acknowledgement ... ok
+test tests::explicitly_disabled_mode_does_not_wait_for_adaptive_timing ... ok
+test tests::presets_are_the_dlss_factors ... ok
+test tests::disabled_mode_still_publishes_its_public_resources ... ok
+test tests::the_assumed_band_is_the_narrow_one_and_is_labelled ... ok
+test adaptive_runtime::tests::pending_and_stale_effects_hold_even_with_validated_high_gpu_cost ... ok
+test tests::the_ladder_is_clipped_to_the_band ... ok
+test tests::upscale_ratios_are_the_reciprocal_with_ends_swapped ... ok
+test adaptive_runtime::tests::default_timing_is_unavailable_and_app_delta_cannot_lower_quality ... ok
+test tests::disabled_plugin_supports_camera_cut_handlers ... ok
+test tests::the_resolution_override_is_registered_in_the_render_world_too ... ok
+test tests::interpolation_frame_timing_ignores_virtual_pause_and_speed ... ok
+test tests::interpolation_frame_timing_clamps_first_frame_and_real_hitch ... ok
+test adaptive_runtime::tests::validated_gpu_decisions_ignore_virtual_time_pause_and_speed ... ok
+2026-10-10 17:12:30.292 bevy_metalfx-54766e314a5b4b60[32817:26528543] Metal API Validation Enabled
+test platform::device_band_tests::the_device_reports_its_temporal_band ... ok
+test node::resolve::tests::resolve_bindings_reuse_source_texture_and_invalidate_on_replacement ... ok
+
+test result: ok. 130 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s

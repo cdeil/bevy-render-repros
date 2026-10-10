@@ -100,3 +100,8 @@ original analytic geometry, real Metal GPU output, a scene-cut reset check and a
 reset-every-frame control. This is not a live Bevy plugin or vendor-quality ranking.
 
 ![Actual native diagnostic output](evidence/metalfx/comparison-0015.png)
+
+The same packet includes a prepared [Bevy 0.20 port of the existing upscaler
+plugin](review/04-metalfx.md#additional-concrete-migration-patch), its original
+procedural consumer and actual spatial/temporal output checks. Upscaling and
+ray denoising remain separate features.

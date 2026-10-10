@@ -88,3 +88,48 @@ Sources: [Apple API](https://developer.apple.com/documentation/metalfx/mtlfxtemp
 [WWDC25 session](https://developer.apple.com/videos/play/wwdc2025/211/),
 [released plugin manifest](https://docs.rs/crate/bevy_metalfx/0.4.2/source/Cargo.toml).
 No upstream implementation was copied into this example.
+
+## Additional concrete migration patch
+
+The native demo is separate from `patches/ushas-bevy-20.patch`, which ports the
+existing upscaler plugin at `717a240038e9ee41ecec39591bed40f1240bd8eb` to Bevy 0.20.
+Dependency bumps alone produced 24 library compilation errors. The patch updates
+sub-app extraction labels/generics, queries `ResolvedCompositingSpace`, handles
+fallible timestamp mapping, and migrates the existing GPU resolve test to the
+new device/submission API. It raises the library MSRV to Bevy's 1.97.1.
+
+```sh
+git clone https://github.com/mistakeknot/ushas.git ../ushas
+git -C ../ushas checkout 717a240038e9ee41ecec39591bed40f1240bd8eb
+git -C ../ushas apply ../bevy-render-repros/patches/ushas-bevy-20.patch
+cargo build --release --manifest-path metalfx-plugin/Cargo.toml
+MTL_DEBUG_LAYER=1 "$CARGO_TARGET_DIR/release/metalfx-plugin-repro" spatial /absolute/new-spatial.png
+MTL_DEBUG_LAYER=1 "$CARGO_TARGET_DIR/release/metalfx-plugin-repro" temporal /absolute/new-temporal.png
+```
+
+`metalfx-plugin` is an original offscreen 11-rod scene with no downloaded assets.
+It waits for repeated **current-frame `OutputWritten` observations**, then also
+verifies completed screenshot readback; configuration/encoded status alone is
+not accepted as GPU output. Spatial and temporal upscaling both actually ran on
+Metal under API validation, and differ from the same-scale disabled/bilinear
+control. This does **not** add ray reconstruction or establish panel presentation.
+The comparison is an output identity check, not an upscaler quality benchmark.
+
+![Actual live plugin captures](../evidence/metalfx-plugin/comparison.png)
+
+The plugin's 130 existing Mac library tests passed, including the explicitly
+executed Metal resolve test. Its first migrated GPU test failed because the
+new command-buffer finishing API requires an initialized ComputeTaskPool;
+that test setup was corrected and the complete run passed. Initial diagnostics
+are retained privately; this is a migration/setup issue, not a Bevy defect.
+
+Reproduction driver: `uv run --script run_plugin_matrix.py` after building the
+standalone manifest. On Linux it expects `UnsupportedPlatform`, captures the
+fallback and never reports native MetalFX execution. The fixture generator also
+ran on Linux; frame 15 SHA256 matches the Mac input exactly:
+`bb81a5ff671cfb7cbd605edc4348c87273d8e0ddd1842caf88119d072b084a34`.
+
+Mac Clippy passed with `-D warnings -A deprecated`: the exemption is for existing
+Rust/glam deprecation warnings, not new migration diagnostics. It does not claim
+an entirely warning-free upstream crate on Rust 1.99. Its default pinned 1.97.1
+can be overridden with `RUSTUP_TOOLCHAIN=stable` for a current installed compiler.
