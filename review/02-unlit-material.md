@@ -43,7 +43,8 @@ No Bevy checkout is needed. `build_solari_variants.py` copies the released
 `bevy_solari` 0.20.0 crate from Cargo's registry, applies the patch files and
 builds the procedural scene against each copy. On macOS the dispatch change from
 packet 1 is required, so both binaries include it; it does not affect these
-colors. `evidence/unlit-controls-*/variants.json` lists the exact patch sets.
+colors. `evidence/unlit-controls-*/variants.json` lists the variants built on
+each host; see [Provenance](#provenance) for what the recorded runs do not show.
 
 ```sh
 export CARGO_TARGET_DIR="${REPRO_DATA:-$HOME/data/bevy-render-repros}/cache/cargo-target"
@@ -54,6 +55,23 @@ uv run --script run_unlit_matrix.py \
   --out /new/unlit-run
 ```
 
+New runs record each binary's file name, SHA-256 and embedded WGSL markers in
+`results.json`, using the same check as `build_solari_variants.py`, and refuse a
+pair unless only the "before" binary lacks the unlit marker and both agree on the
+dispatch-struct marker. The padding fallback changes only Rust, so the markers
+cannot tell it apart from no dispatch change.
+
+Recorded runs are rechecked offline, without a GPU. `--verify-existing` reruns
+every assertion below on the saved PNGs and logs, requires the recorded numbers
+to reproduce exactly, only reads the run folder and writes its report to a new
+folder. `test_offline_checks.py` also runs it on corrupted copies, which must fail:
+
+```sh
+uv run --script run_unlit_matrix.py --verify-existing evidence/unlit-controls-mac --out /new/verify-mac
+uv run --script run_unlit_matrix.py --verify-existing evidence/unlit-controls-linux --out /new/verify-linux
+uv run --script test_offline_checks.py
+```
+
 Solari reads the deferred G-buffer, so **deferred raster** is the exact reference.
 Each stage captures, with the original and the patched binary:
 
@@ -62,19 +80,26 @@ Each stage captures, with the original and the patched binary:
 | Fixture color, EV100 9.7, 3, 0 | forward raster, deferred raster, Solari ReSTIR off/on | equals deferred raster exactly |
 | Textured: nearest 2×2 checker in `base_color_texture` | same four, EV100 9.7 | equals deferred raster exactly |
 | Saturated (255,4,4), (200,10,120), (250,250,1) | same four, EV100 9.7 | equals deferred raster exactly |
-| Solari camera with forward materials, three EVs | bypass control | whole image identical to forward raster |
+| Solari camera with forward materials, three EVs | bypass control | whole image within one level of forward raster, on at most 0.1 % of pixels |
 | Same color as an ordinary lit material, ReSTIR off/on | lit regression | under 0.1 % of pixels differ by more than 2 levels from the original |
 
 The original Solari output must differ from deferred raster (mean error over
-one level) in every Solari case, and every raster image must be bit-identical
-between the two binaries. Masks are the authored-color interior of the forward
-raster image, eroded by two pixels to exclude edges (15,363 pixels).
+one level) in every Solari case, and every raster and bypass image must be
+bit-identical between the two binaries. Masks are the authored-color interior of
+the forward raster image, eroded by two pixels to exclude edges (15,363 pixels).
 
 **Forward cases bypass Solari.** A Solari camera with forward materials renders
-exactly like plain raster: the image is identical and the ReSTIR setting has no
-effect. The earlier matrix's six "forward ReSTIR" captures were therefore raster
-duplicates, not Solari tests; the new matrix keeps one bypass control per
-exposure and labels it as such.
+like plain raster and the ReSTIR setting has no effect. On Metal the image is
+identical at every exposure, and on Vulkan at EV100 3 and 0. On Vulkan at
+EV100 9.7, 160 floor pixels (0.061 %, bottom-right corner, x 487–511,
+y 499–511) are one level darker than raster (239 instead of 240 in each
+channel), identically before and after the patch. One possible cause, inferred
+from source only and not verified, is the `Hdr` intermediate that the Solari
+camera requires and the sRGB raster camera does not use. The same bound, at most
+one level on at most 0.1 % of pixels, applies on every host. The earlier
+matrix's six "forward ReSTIR" captures were therefore raster duplicates, not
+Solari tests; the new matrix keeps one bypass control per exposure and labels it
+as such.
 
 **Forward raster is not the contract.** Deferred raster differs from forward
 raster by up to 4 levels for saturated colors because of the G-buffer's RGB9E5
@@ -87,7 +112,8 @@ passed.
 
 `evidence/unlit-controls-mac/` (Apple M5 Pro, Metal API validation confirmed from
 the runtime log line in every run) and `evidence/unlit-controls-linux/`
-(RTX 4060 Ti, Vulkan) each hold 70 captures. Both hosts pass every assertion:
+(RTX 4060 Ti, Vulkan) each hold 70 captures. Both hosts pass every assertion,
+rechecked offline with `--verify-existing`:
 
 | Case | Original Solari vs deferred raster (max / mean) | Patched |
 | --- | --- | --- |
@@ -95,6 +121,13 @@ the runtime log line in every run) and `evidence/unlit-controls-linux/`
 | Fixture, EV100 3 and 0 | 223 / 190–191 (white) | 0 |
 | Textured, ReSTIR off / on | 223 / 40.4, 177–178 / 40.4 | 0 |
 | (255,4,4), (200,10,120), (250,250,1) | 194–243 / 86–150 | 0 (forward raster differs by 4, 3, 1) |
+
+Bypass control against forward raster, whole image, both stages:
+
+| Host | EV100 9.7 | EV100 3 | EV100 0 |
+| --- | --- | --- | --- |
+| Metal | identical | identical | identical |
+| Vulkan | 160 pixels differ by 1 level | identical | identical |
 
 Lit-material regression, fraction of pixels differing by more than 2 levels:
 
@@ -111,6 +144,18 @@ lit pixels. Some logs of both the original and the new runs, before and after th
 patch, contain an intermittent startup warning about an unresolved
 `bevy_solari::scene::sampling` shader import; it appears with unpatched binaries
 too and every affected run still passes.
+
+## Provenance
+
+The recorded `results.json` files predate binary fingerprints: they store the
+cases and flags, not which binaries produced them, and no hash is reconstructed
+for them now. Each folder's `variants.json` lists the variants built on that
+host: four on Metal, including `padding-unlit`, and three on Vulkan. The
+intended pair is `dispatch-struct` and `struct-unlit`, but these runs cannot
+prove it. The original padding-based matrix gives the same patched cube pixels,
+so the conclusion does not depend on the dispatch change used. Offline
+verification reports the pair as unknown. Runs made with the current script
+record it.
 
 ## Bounds and review questions
 

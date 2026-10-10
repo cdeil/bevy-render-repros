@@ -9,8 +9,10 @@ import json
 import os
 import subprocess
 from pathlib import Path
+
 import numpy as np
 from PIL import Image
+
 from repro_run import fresh_root, require_validation, sanitize
 
 RED = (255, 0, 0)

@@ -16,7 +16,8 @@ import shutil
 import subprocess
 import tomllib
 from pathlib import Path
-from repro_run import ROOT, fresh_root
+
+from repro_run import ROOT, SOLARI_MARKERS, binary_fingerprint, fresh_root
 
 PATCHES = ROOT / "patches"
 VARIANTS = {
@@ -30,11 +31,6 @@ VARIANTS = {
         "solari-metal-dispatch-padding.patch",
         "solari-unlit-color.patch",
     ],
-}
-# Embedded shader text proves which WESL each binary contains.
-MARKERS = {
-    "solari-dispatch-indirect-args.patch": "DispatchIndirectArgs((active_cell_count",
-    "solari-unlit-color.patch": "if surface.unlit {",
 }
 DEFAULT = ["dispatch-struct", "dispatch-padding"]
 if (PATCHES / "solari-unlit-color.patch").exists():
@@ -124,16 +120,18 @@ bevy_solari = {{ path = "bevy_solari-{variant}" }}
     binary = folder / "bin" / package
     binary.parent.mkdir()
     shutil.copy2(target / package, binary)
-    contents = binary.read_bytes()
-    markers = {}
-    for patch, marker in MARKERS.items():
-        present = marker.encode() in contents
-        assert present == (patch in VARIANTS[variant]), (variant, marker)
-        markers[marker] = present
+    fingerprint = binary_fingerprint(binary)
+    # WGSL patches must be present exactly as listed; a Rust-only patch has no marker.
+    for patch, marker in SOLARI_MARKERS.items():
+        assert fingerprint["markers"][marker] == (patch in VARIANTS[variant]), (
+            variant,
+            marker,
+        )
     built[variant] = {
         "binary": str(binary.relative_to(out)),
         "patches": VARIANTS[variant],
-        "markers": markers,
+        "sha256": fingerprint["sha256"],
+        "markers": fingerprint["markers"],
     }
     print(variant, built[variant], flush=True)
 (out / "variants.json").write_text(json.dumps(built, indent=2) + "\n")
