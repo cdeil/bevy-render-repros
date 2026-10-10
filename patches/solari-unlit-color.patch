@@ -1,6 +1,9 @@
 Adapted from bevyengine/bevy@b3bdd75becaffe9a16677cf5bae5bd6d198f052b (MIT);
 source paths are listed in the diff, original change is described in review/.
 License and notices: THIRD_PARTY_NOTICES.md and LICENSES/bevy-MIT.txt.
+TECHNICAL DRAFT prepared with AI assistance. Its code comments and documentation
+text are not submission prose: under Bevy's AI policy a human contributor must
+understand the change and independently write any prose before submission.
 
 diff --git a/crates/bevy_solari/src/realtime/gbuffer_utils.wesl b/crates/bevy_solari/src/realtime/gbuffer_utils.wesl
 index b6dceba..3f03203 100644
@@ -15,7 +18,7 @@ index b6dceba..3f03203 100644
 +    unlit: bool,
  }
 @@ -26,3 +27,4 @@ fn gpixel_resolve(gpixel: vec4<u32>, depth: f32, pixel_id: vec2<u32>, view_size:
- 
+
 -    return ResolvedGPixel(world_position, world_normal, material);
 +    let unlit = (unpack_flags(gpixel.a) & DEFERRED_FLAGS_UNLIT_BIT) != 0u;
 +    return ResolvedGPixel(world_position, world_normal, material, unlit);

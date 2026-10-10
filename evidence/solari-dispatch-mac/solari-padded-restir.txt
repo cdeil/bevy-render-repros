@@ -1,0 +1,7 @@
+Procedural cube and floor; no downloaded assets; output=$RUN_ROOT/solari-padded-restir.png
+160 updates completed; screenshot saved; solari=true
+2026-10-10 18:29:41.195 bevy-scene-solari-dispatch-padding[68760:26747747] Metal API Validation Enabled
+2026-10-10T16:29:41.277006Z  WARN bevy_shader::shader_cache: Shader `embedded://bevy_solari/realtime/presample_light_tiles.wesl` has an unresolved import:
+error: module not found: `bevy_pbr::render::pbr_functions` (no shader registered for this module path)
+  |
+  = note: in unknown module

@@ -5,44 +5,80 @@ no dedicated denoiser issue in Bevy or the plugin tracker on 2026-10-10. Bevy's
 merged [Metal support PR #25123](https://github.com/bevyengine/bevy/pull/25123)
 already identifies the missing denoiser and mentions MetalFX as a possible route.
 Do not open a duplicate "Metal does not denoise" bug.
+All prose here is a technical draft prepared with AI assistance, not submission text.
 
 ## What runs
 
 `metalfx/generate_guides.py` creates original analytic spheres, thin rods and a
 plane, with seeded multiplicative radiance noise of known expectation. It is
 **not** a physical path-tracer. There are no downloaded scenes or textures.
-Depth is reversed-Z, matrices are right-handed/column-major, normals are world
-space and roughness is exported perceptually and squared by the adapter. The
-camera and geometry are static within each segment, so motion and jitter are 0.
-At frame 16 the object jumps: that is a scene cut with an explicit history reset.
+Depth is reversed-Z, matrices are right-handed/column-major and roughness is
+exported perceptually and squared by the adapter. Normals are written in world
+space, but `world_to_view` is the identity, so this fixture cannot tell world
+from view space; that convention is untested. The camera and geometry are static
+within each segment, so motion and jitter are 0.
+
+At frame 16 the sphere **teleports**; the camera does not move, so this is not a
+camera cut. The replay resets history there as an explicit history-reset control.
+That is not a proposed bridge policy: resets belong on camera cuts, resizes and
+toggles, while object motion and disocclusion belong to motion vectors.
 
 `metalfx/replay.swift` uses Apple's actual `MTLFXTemporalDenoisedScaler`, creates
 textures with the API's requested usage, encodes Metal commands, waits for GPU
-completion and asserts finite HDR readback. A reset-every-frame run is the control.
-`metalfx/analyze.py` verifies guide ranges/normals, raw-data identity, finite
-outputs, scene-cut reset equivalence and an observable temporal-history effect.
+completion and asserts finite HDR readback. Each replay records its history
+policy in `report.json`: the normal run, a `--reset-every-frame` control, and a
+`--no-cut-reset` control that keeps history across the teleport.
+
+`metalfx/analyze.py` verifies guide ranges/normals, raw-data identity and finite
+outputs, and asserts:
+
+- both reports describe the expected policy and 32 frames;
+- Metal API validation from the runtime's `Metal API Validation Enabled` log line
+  of each replay, not from the requested environment variable;
+- at frames 0 and 16, output equals the reset control within 0.0002 linear HDR;
+- history helps: coherent MSE is below reset-every-frame MSE on every other
+  frame, and below 0.8 × reset MSE from the fourth frame after each reset;
+- with the no-reset control, frames 0–15 are bit-identical to the normal run and
+  frame 16 differs.
 
 ```sh
-export REPRO_DATA="${REPRO_DATA:-$HOME/data/bevy-render-repros}"
-uv run --script metalfx/generate_guides.py "$REPRO_DATA/guides"
-MTL_DEBUG_LAYER=1 xcrun swift metalfx/replay.swift "$REPRO_DATA/guides" "$REPRO_DATA/coherent"
-MTL_DEBUG_LAYER=1 xcrun swift metalfx/replay.swift "$REPRO_DATA/guides" "$REPRO_DATA/reset" --reset-every-frame
-uv run --script metalfx/analyze.py "$REPRO_DATA/guides" "$REPRO_DATA/coherent" "$REPRO_DATA/reset" evidence/metalfx
+uv run --script metalfx/run_native.py --out /new/metalfx-run
 ```
 
-Use new output directories; the programs deliberately refuse to overwrite them.
-Build/raw products stay outside the repository. macOS 26+ and a device supporting
-this API are required. A supported SDK alone does not establish device support.
-Linux can generate the fixture, but cannot execute Apple's MetalFX API.
+`run_native.py` generates the guides, runs the three replays with
+`MTL_DEBUG_LAYER=1`, stores their logs and writes the analysis to
+`<run>/evidence/`. Every step refuses an existing output folder, so recorded
+evidence is never overwritten; reviewed results are added to `evidence/` under a
+new name by an explicit copy. macOS 26+ and a device supporting this API are
+required. A supported SDK alone does not establish device support. Linux can
+generate the fixture, but cannot execute Apple's MetalFX API.
 
 ## Measured diagnostic
 
 Apple M5 Pro, macOS 27.0.1: **64 completed GPU frames** (32 coherent + 32 reset
-control), Metal API validation enabled. First-frame and cut-frame output match
-the reset control within the asserted 0.0002 linear-HDR tolerance. On frame 15,
-coherent versus reset output has MAE 0.00985, demonstrating actual history use.
-Mean linear MSE against this analytic fixture is 0.04307 raw versus 0.0002451
-coherent. These are diagnostic fixture values, **not a vendor-quality ranking**.
+control), Metal API validation enabled. First-frame and teleport-frame output
+match the reset control within the asserted 0.0002 linear-HDR tolerance. Mean
+linear MSE against this analytic fixture is 0.04307 raw, 0.0002451 coherent and
+0.0004692 with reset every frame; coherent MSE is 0.33–0.55 × the reset control's
+from the fourth frame after each reset (frame 15: 0.000201 versus 0.000483).
+These are diagnostic fixture values, **not a vendor-quality ranking**.
+
+A rerun with the strengthened analysis and the no-reset control
+(`evidence/metalfx-history/`, 96 frames with validation confirmed from the logs)
+reproduced every per-frame metric of `evidence/metalfx/` exactly. Whole-frame and
+local error tell different stories at the teleport:
+
+| Frame 16 | Reset at teleport | History kept |
+| --- | --- | --- |
+| Whole-frame MSE | 0.000474 | 0.000393 |
+| MSE over the sphere's old and new positions (7,862 px) | 0.00119 | 0.00131 |
+
+Keeping history lowers whole-frame error, because about 87 % of the frame is
+unchanged and its history stays valid, but raises error where the sphere moved and
+leaves a visible ghost of the old position
+(`evidence/metalfx-history/teleport-0016-crop.png`). The reset equivalence proves
+that the reset is honoured; it does not show that resetting on object motion is
+better.
 
 Initialization was 0.935 seconds. Median GPU command time including output
 readback was 1.944 ms at 320×192; no complete-renderer speed claim is implied.
@@ -123,8 +159,8 @@ new command-buffer finishing API requires an initialized ComputeTaskPool;
 that test setup was corrected and the complete run passed. Initial diagnostics
 are retained privately; this is a migration/setup issue, not a Bevy defect.
 
-Reproduction driver: `uv run --script run_plugin_matrix.py` after building the
-standalone manifest. On Linux it expects `UnsupportedPlatform`, captures the
+Reproduction driver: `uv run --script run_plugin_matrix.py --out /new/folder` after
+building the standalone manifest; it records Metal validation from the runtime log line. On Linux it expects `UnsupportedPlatform`, captures the
 fallback and never reports native MetalFX execution. The fixture generator also
 ran on Linux; frame 15 SHA256 matches the Mac input exactly:
 `bb81a5ff671cfb7cbd605edc4348c87273d8e0ddd1842caf88119d072b084a34`.
@@ -139,3 +175,19 @@ build/check and Clippy completed, and all three procedural consumer modes comple
 screenshot readback. Spatial/temporal report `UnsupportedPlatform`, with images
 identical to the disabled control; no native execution is claimed. macOS and Linux
 CI-style Clippy use the disclosed `-A deprecated` allowance.
+
+## Correction-round port validation
+
+The migration now includes the separate smoke, benchmark, timing-probe and
+claude-model packages, their lockfiles, CI/MSRV1.97.1 and compatibility docs.
+Successful mapped buffers are unmapped on every subsequent error path. Actual
+Mac Rust1.97.1 CI checks passed: seven library feature sets, all-target Clippy,
+doctests, both hardware tests, package/license checks and all four tool packages
+(58 smoke, 69 benchmark, 4 timing-probe and 3 model tests), plus 35 Swift tests.
+The upgrade-introduced glam warning and atomic deprecation are fixed. Equivalent
+array chunk iterations also remove Rust1.99 tool Clippy failures; the 131 tests
+of smoke/benchmark/timing-probe and their strict Clippy passed again on 1.99.
+No deprecation exception is required. This is CPU/tool and bounded GPU evidence;
+full interactive smoke/benchmark rendering, resize, moving camera and presentation
+coverage remain outside this packet. The external frozen consumer still uses
+Bevy0.19 and must itself migrate before its full compatibility trial can pass.

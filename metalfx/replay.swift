@@ -1,13 +1,18 @@
 // Offline replay of original procedural HDR/surface buffers through Apple's denoiser.
 // This proves native GPU execution, not Bevy/wgpu integration or moving-worker support.
-// xcrun swift replay.swift <guide folder> <new output folder>
+// xcrun swift replay.swift <guide folder> <new output folder> [--reset-every-frame | --no-cut-reset]
 import Foundation
 import Metal
 import MetalFX
 import simd
 
-guard CommandLine.arguments.count == 3 || CommandLine.arguments.count == 4 else { fatalError("Usage: replay.swift <guides> <new output> [--reset-every-frame]") }
-guard CommandLine.arguments.count == 3 || CommandLine.arguments[3] == "--reset-every-frame" else { fatalError("Unknown flag") }
+// --reset-every-frame: control without history. --no-cut-reset: keep history across the
+// frame-16 object teleport, to compare against the explicit reset there.
+guard CommandLine.arguments.count == 3 || CommandLine.arguments.count == 4 else { fatalError("Usage: replay.swift <guides> <new output> [--reset-every-frame | --no-cut-reset]") }
+let flag = CommandLine.arguments.count == 4 ? CommandLine.arguments[3] : nil
+guard flag == nil || flag == "--reset-every-frame" || flag == "--no-cut-reset" else { fatalError("Unknown flag") }
+let resetEveryFrame = flag == "--reset-every-frame"
+let cutReset = flag != "--no-cut-reset"
 let input = URL(fileURLWithPath: CommandLine.arguments[1])
 let output = URL(fileURLWithPath: CommandLine.arguments[2])
 guard !FileManager.default.fileExists(atPath: output.path) else { fatalError("Use a new output folder") }
@@ -105,7 +110,7 @@ for (index, file) in files.enumerated() {
         scaler.jitterOffsetX = -jitter[0]; scaler.jitterOffsetY = -jitter[1]
         scaler.worldToViewMatrix = matrix(meta.world_to_view.map(Float.init))
         scaler.viewToClipMatrix = matrix(meta.view_to_clip.map(Float.init))
-        scaler.shouldResetHistory = index == 0 || meta.reset_history || CommandLine.arguments.contains("--reset-every-frame")
+        scaler.shouldResetHistory = index == 0 || (meta.reset_history && cutReset) || resetEveryFrame
         let started = Date()
         let command = queue.makeCommandBuffer()!
         scaler.encode(commandBuffer: command)
@@ -130,8 +135,12 @@ let report: [String: Any] = [
     "gpu_seconds": gpuSeconds, "encode_wait_seconds": wallSeconds,
     "roughness_mapping": "Fixture perceptual roughness squared to linear roughness",
     "motion_mapping": "Unjittered UV displacement, negated and scaled to pixels",
-    "history": "Reset at first frame and explicit scene cut; optional reset-every-frame control",
-    "metal_api_validation": ProcessInfo.processInfo.environment["MTL_DEBUG_LAYER"] == "1",
+    "history": resetEveryFrame ? "Reset every frame (no-history control)"
+        : cutReset ? "Reset at first frame and at the frame-16 object teleport"
+        : "Reset at first frame only; history kept across the frame-16 object teleport",
+    "reset_every_frame": resetEveryFrame, "teleport_reset": cutReset,
+    // Requested only; the analysis checks the runtime's own log line.
+    "metal_api_validation_requested": ProcessInfo.processInfo.environment["MTL_DEBUG_LAYER"] == "1",
     "os": ProcessInfo.processInfo.operatingSystemVersionString,
     "scope": "Offline replay of original procedural buffers, native resolution, actual completed Metal commands. GPU timings include output readback. Not a live Bevy integration or a cross-host renderer benchmark.",
 ]

@@ -1,25 +1,38 @@
 Adapted from bevyengine/bevy@b3bdd75becaffe9a16677cf5bae5bd6d198f052b (MIT);
 source paths are listed in the diff, original change is described in review/.
 License and notices: THIRD_PARTY_NOTICES.md and LICENSES/bevy-MIT.txt.
+TECHNICAL DRAFT prepared with AI assistance. Its code comments and documentation
+text are not submission prose: under Bevy's AI policy a human contributor must
+understand the change and independently write any prose before submission.
 
 diff --git a/crates/bevy_asset/src/io/embedded/mod.rs b/crates/bevy_asset/src/io/embedded/mod.rs
-index ec3b60f..a6aa2ec 100644
+index ec3b60f..54174ca 100644
 --- a/crates/bevy_asset/src/io/embedded/mod.rs
 +++ b/crates/bevy_asset/src/io/embedded/mod.rs
-@@ -306,2 +306,6 @@ pub fn _embedded_asset_path(
+@@ -324,6 +324,10 @@ pub fn _embedded_asset_path(
+ /// 1. The non-default `embedded://` [`AssetSource`](crate::io::AssetSource)
+ /// 2. `src` is trimmed from the path
  ///
-+/// Register the embedded asset before adding plugins or running systems that load it.
-+/// Asset requests may start during plugin construction. Registering a source after an
-+/// earlier request failed does not guarantee that the request will be retried.
++/// Call [`embedded_asset!`] before adding plugins or running systems that load the asset.
++/// Plugin construction can already start loading that path. Registering the embedded
++/// asset after a load of that path has failed does not retry the load.
 +///
- /// `rock.wgsl` can now be loaded by the [`AssetServer`] as follows:
+ /// The default behavior also works for cargo workspaces. Pretend the `bevy_rock` crate now exists in a larger workspace in
+ /// `$SOME_WORKSPACE/crates/bevy_rock`. The asset path would remain the same, because [`embedded_asset!`] searches for the
+ /// _first instance_ of `bevy_rock/src` in the path.
 diff --git a/crates/bevy_render/src/lib.rs b/crates/bevy_render/src/lib.rs
-index 04608ac..9defac6 100644
+index 04608ac..172057b 100644
 --- a/crates/bevy_render/src/lib.rs
 +++ b/crates/bevy_render/src/lib.rs
-@@ -163,2 +163,5 @@ pub struct RenderPlugin {
-     /// This has no effect on macOS, Wasm, iOS, or without the `multi_threaded` feature.
+@@ -160,7 +160,10 @@ use std::sync::Mutex;
+ pub struct RenderPlugin {
+     pub render_creation: RenderCreation,
+     /// If `true`, disables asynchronous pipeline compilation.
+-    /// This has no effect on macOS, Wasm, iOS, or without the `multi_threaded` feature.
++    /// This has no effect on macOS, Wasm, or without the `multi_threaded` feature.
 +    ///
 +    /// This only controls pipeline compilation. Assets must still finish loading and
 +    /// render resources must be prepared before an offline capture can be complete.
      pub synchronous_pipeline_compilation: bool,
+     /// Debugging flags that can optionally be set when constructing the renderer.
+     pub debug_flags: RenderDebugFlags,
