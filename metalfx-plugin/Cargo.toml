@@ -8,4 +8,5 @@ publish = false
 
 [dependencies]
 bevy = { version = "=0.20.0", default-features = false, features = ["default_app", "std", "multi_threaded", "3d_bevy_render", "png"] }
-bevy_metalfx = { path = "../../ushas", features = ["temporal"] }
+# The merged Bevy 0.20 port; a sibling `path = "../../ushas"` checkout works too.
+bevy_metalfx = { git = "https://github.com/mistakeknot/ushas", rev = "bbf188691c17b42461d9049936523abd325745b0", features = ["temporal"] }

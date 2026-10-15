@@ -44,7 +44,7 @@ uv run --script build_solari_variants.py --out "$REPRO_DATA/runs/$RUN_ID-variant
 uv run --script run_bevy_cases.py "$REPRO_DATA/runs/$RUN_ID-variants"
 ```
 
-Each report supplies the remaining case-specific commands. Raytracing requires supported hardware; MetalFX execution requires a supported Mac/device/SDK. The optional MetalFX plugin consumer expects a sibling `~/code/oss/ushas` checkout with the proposed migration patch applied.
+Each report supplies the remaining case-specific commands. Raytracing requires supported hardware; MetalFX execution requires a supported Mac/device/SDK. The optional MetalFX plugin consumer resolves the merged Bevy 0.20 port of `bevy_metalfx` from GitHub at a pinned commit; see the correction in its report about the content size those runs recorded.
 
 ## Evidence and scope
 
