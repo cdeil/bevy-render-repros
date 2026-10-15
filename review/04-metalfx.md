@@ -32,6 +32,8 @@ uv run --script run_plugin_matrix.py --out /new/plugin-run
 
 Clone this repro repository beside `ushas` under `~/code/oss/`; the consumer uses a sibling path. [Metal captures](../evidence/metalfx-plugin/comparison.png) confirm actual spatial/temporal `OutputWritten` plus screenshot readback under API validation. Linux asserts `UnsupportedPlatform` and unchanged fallback output.
 
+**Correction (2026-10-15).** The recorded runs did not upscale. The plugin sizes its reduced-resolution main pass from the primary window, and this harness renders to an image with no window, so the override was never applied: every arm's log records `content_size: [512, 512], output_size: [512, 512]`, the spatial and temporal scalers were created at 512×512 → 512×512, and the "disabled" arm was native rendering rather than a bilinear control. The captures therefore show MetalFX executing at a 1:1 ratio, which proves the encode path and the readback, not a 2× reconstruction. The port itself was correct for windowed apps. A fix that sizes the override from the camera's own render target is prepared for the plugin; once it is merged, the consumer will be re-pinned to that commit and these runs repeated, with the expected `content_size: [256, 256]` asserted.
+
 Strict Clippy and library/tool tests pass on Mac Rust 1.97.1/1.99 and Linux 1.98.1, without deprecation exceptions. Linux: 82 library, 57 smoke, 69 benchmark, 4 timing-probe and 3 model tests; Mac smoke has 58 due to a platform-gated test. Mac checks also cover the Metal resolve test, feature sets, packaging and Swift/Python/Objective-C tests. Full interactive resize, moving-camera and presentation coverage is not claimed. The frozen external Bevy 0.19 consumer must migrate separately.
 
 ## Next integration step
